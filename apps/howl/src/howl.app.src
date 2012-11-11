@@ -1,0 +1,15 @@
+%% -*- erlang -*-
+{application, howl,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib,
+                  cowboy,
+                  riak_core
+                 ]},
+  {mod, { howl_app, []}},
+  {env, []}
+ ]}.

@@ -1,0 +1,15 @@
+.eunit
+dev
+ebin
+standalone.config
+db
+deps
+*~
+.DS_Store
+Mnesia.*
+erl_crash.dump
+*.beam
+rel/snarl
+rel/snarl.tar.bz2
+manifest
+gproc_dist_*

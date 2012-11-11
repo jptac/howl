@@ -1,0 +1,8 @@
+*.beam
+.eunit
+deps/*
+apps/howl/ebin
+*~
+dev/*
+doc/*
+rel/howl
