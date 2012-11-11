@@ -8,6 +8,7 @@
                   kernel,
                   stdlib,
                   cowboy,
+                  mdns_server_lib,
                   riak_core
                  ]},
   {mod, { howl_app, []}},

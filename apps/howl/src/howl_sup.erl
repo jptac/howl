@@ -44,10 +44,7 @@ init(_Args) ->
 			  cowboy_tcp_transport, [{port, HTTPPort}],
 			  cowboy_http_protocol, [{dispatch, Dispatch}]
 			 ),
-
-    {ok, TCPPort} = application:get_env(tcp_port),
-    {ok, _} = ranch:start_listener(chunter_server, 1,
-                                   ranch_tcp, [{port, TCPPort}], howl_tcp_protocol, []),
     { ok,
         { {one_for_one, 5, 10},
           [VMaster, WriteFSMs, ReadFSMs, CoverageFSMs]}}.
+
