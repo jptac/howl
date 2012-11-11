@@ -55,6 +55,8 @@ dev1 dev2 dev3: all
 	mkdir -p dev
 	(cd rel && $(REBAR) generate target_dir=../dev/$@ overlay_vars=vars/$@.config)
 
+xref: all
+	$(REBAR) xref skip_deps=true
 
 ##
 ## Dialyzer

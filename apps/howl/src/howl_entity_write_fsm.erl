@@ -12,6 +12,23 @@
 -export([init/1, code_change/4, handle_event/3, handle_info/3,
          handle_sync_event/4, terminate/3]).
 
+
+-ignore_xref([
+              code_change/4,
+              execute/2,
+              handle_event/3,
+              handle_info/3,
+              handle_sync_event/4,
+              init/1,
+              mk_reqid/0,
+              prepare/2,
+              start_link/5,
+              start_link/6,
+              terminate/3,
+              waiting/2,
+	      write/3
+             ]).
+
 %% States
 -export([prepare/2, execute/2, waiting/2]).
 

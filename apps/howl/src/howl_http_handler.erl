@@ -5,6 +5,9 @@
 -export([websocket_init/3, websocket_handle/3,
 	 websocket_info/3, websocket_terminate/3]).
 
+-ignore_xref([websocket_init/3, websocket_handle/3,
+	 websocket_info/3, websocket_terminate/3]).
+
 init({_Any, http}, Req, []) ->
     case cowboy_http_req:header('Upgrade', Req) of
 	{undefined, Req2} -> {ok, Req2, undefined};
@@ -73,7 +76,6 @@ terminate(_Req, _State) ->
     ok.
 
 websocket_init(_Any, Req, []) ->
-    howl:listen(<<"all">>),
     Req2 = cowboy_http_req:compact(Req),
     {ok, Req2, undefined, hibernate}.
 

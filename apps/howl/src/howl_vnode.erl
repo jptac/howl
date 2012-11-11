@@ -22,6 +22,13 @@
 
 -export([listen/4, listeners/3]).
 
+
+-ignore_xref([
+	      start_vnode/1,
+              listen/4, 
+	      listeners/3
+             ]).
+
 -record(state, {partition,
 		node,
 		channels,
@@ -152,8 +159,14 @@ handle_exit(Listener, _Reason, State = #state{channels=Channels0, listeners=List
 				    {Channel, #howl_obj{val=Val0} = O} = lists:keyfind(Channel, 1, Channels1),
 				    Val1 = statebox:modify({fun howl_entity_state:remove/2, [Listener]}, Val0),
 				    Val2 = statebox:expire(?STATEBOX_EXPIRE, Val1),
-				    Obj = howl_obj:update(Val2, Listener, O),
-				    lists:keystore(Channel, 1, Channels1, {Channel, Obj})
+				    case statebox:value(Val2) of
+					[] ->
+					    lists:keydelete(Channel, 1, Channels1);
+					_ ->
+					    
+					    Obj = howl_obj:update(Val2, Listener, O),
+					    lists:keystore(Channel, 1, Channels1, {Channel, Obj})
+				    end
 			    end, Channels0, ToDelete),
     {noreply, State#state{listeners = Listeners1,
 			  channels = Channels2}}.

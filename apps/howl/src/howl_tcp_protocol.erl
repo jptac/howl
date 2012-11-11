@@ -41,7 +41,7 @@ loop(Socket, Transport, HandlerState) ->
     end.
 
 handle_message({msg, Channel, Msg}, State) ->
-    howl:send(Channel, Msg);
+    howl:send(Channel, Msg),
     {noreply, State};
 
 handle_message(Oops, State) ->

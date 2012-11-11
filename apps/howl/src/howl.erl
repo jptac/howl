@@ -8,6 +8,8 @@
 	 send/2
         ]).
 
+-ignore_xref([ping/0]).
+
 %% Public API
 
 %% @doc Pings a random vnode to make sure communication is functional
