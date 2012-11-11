@@ -8,6 +8,7 @@
                   kernel,
                   stdlib,
                   cowboy,
+                  libsnarl,
                   mdns_server_lib,
                   riak_core
                  ]},

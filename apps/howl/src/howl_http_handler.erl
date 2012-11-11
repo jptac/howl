@@ -32,10 +32,21 @@ handle(Req, State) ->
     }
     function send(input, event) {
       if (event.keyCode == 13) {
-        ws.send(input.value);
+        ws.send(JSON.stringify({join: input.value}));
         input.value = '';
       }
     }
+    function auth(pass, event) {
+      if (event.keyCode == 13) {
+        var user = document.getElementById('user');
+        ws.send(JSON.stringify(
+         {auth: {'user': user.value, 'pass': pass.value}}
+        ));
+       user.value = '';
+       pass.value = '';
+      }
+    }
+
     function ready(){
       if ('MozWebSocket' in window) {
         WebSocket = MozWebSocket;
@@ -63,13 +74,19 @@ handle(Req, State) ->
   </head>
   <body onload='ready();'>
   <div id='content' style='overflow:scroll;height:90%'></div>
+
+  <div id='login'>
+    <label>auth</label>
+    <input id='user' type='text' onkeyup='auth(this, event);'/>
+    <input type='text' onkeyup='auth(this, event);'/>
+  </div>
+
   <div id='input'>
     <label>Channel</label>
     <input type='text' onkeyup='send(this, event);'/>
   </div>
   </body>
-</html>">>,
-				       Req),
+</html>">>,Req),
     {ok, Req2, State}.
 
 terminate(_Req, _State) ->
@@ -79,18 +96,42 @@ websocket_init(_Any, Req, []) ->
     Req2 = cowboy_http_req:compact(Req),
     {ok, Req2, undefined, hibernate}.
 
-websocket_handle({text, Channel}, Req, State) ->
-    howl:listen(Channel),
-    {ok, Req, State};
+websocket_handle({text, Raw}, Req, State) ->
+    handle_json(jsx:decode(Raw), Req, State);
 
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
 websocket_info({msg, Msg}, Req, State) ->
-    {reply, {text, Msg}, Req, State, hibernate};
+    {reply, {text, jsx:encode(Msg)}, Req, State, hibernate};
 
 websocket_info(_Info, Req, State) ->
     {ok, Req, State, hibernate}.
 
 websocket_terminate(_Reason, _Req, _State) ->
     ok.
+
+handle_json([{<<"auth">>, Auth}], Req, _State) ->
+    {<<"user">>, User} = lists:keyfind(<<"user">>, 1, Auth),
+    {<<"pass">>, Pass} = lists:keyfind(<<"pass">>, 1, Auth),
+    case libsnarl:auth(User, Pass) of
+	{reply, {ok, Token}} ->
+	    {reply, {text, jsx:encode([{<<"ok">>, <<"authenticated">>}])}, Req, Token};
+	_ ->
+	    {reply, {text, jsx:encode([{<<"error">>, <<"authentication failed">>}])}, Req, undefined}
+    end;
+
+handle_json(_, Req, undefined) ->
+    {reply, {text, jsx:encode([{<<"error">>, <<"not authenticated">>}])}, Req, undefined};
+
+handle_json([{<<"join">>, Channel}], Req, Token) ->
+    case libsnarl:allowed(Token, [<<"channel">>, Channel, <<"join">>]) of
+	{reply, true} ->
+	    howl:listen(Channel),
+	    {reply, {text, jsx:encode([{<<"ok">>, <<"channel joined">>}])}, Req, Token};
+	_ ->
+	    {reply, {text, jsx:encode([{<<"error">>, <<"permission denied">>}])}, Req, Token}
+    end;	    
+
+handle_json(_JSON, Req, State) ->
+    {ok, Req, State}.
