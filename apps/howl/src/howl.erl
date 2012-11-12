@@ -21,11 +21,7 @@ ping() ->
 
 
 listen(Channel) ->
-    howl_entity_write_fsm:write(
-      { 
-       howl_vnode, 
-       howl
-      }, Channel, listen, self()).
+    howl_entity_write_fsm:write({howl_vnode,howl}, Channel, listen, self()).
 
 
 send(Channel, Message) ->
@@ -33,7 +29,7 @@ send(Channel, Message) ->
 	{ok, not_found} ->
 	    ok;
 	{ok, Listeners} ->
-	    M = {msg, Message},
+	    M = {msg, [{<<"channel">>, Channel}, {<<"message">>, Message}]},
 	    [L ! M || L <- Listeners],
 	    ok
-	end.
+    end.

@@ -63,9 +63,12 @@ listeners(Preflist, ReqID, Channel) ->
 handle_command(ping, _Sender, State) ->
     {reply, {pong, State#state.partition}, State};
 
-handle_command({repair, undefined, Channel, Obj}, _Sender, #state{channels=Channels0}=State) ->
+handle_command({repair, undefined, Channel, #howl_obj{val=Val0} = Obj}, _Sender, 
+	       #state{channels=Channels0}=State) ->
+    Listeners = [{L, Channel} || L <- statebox:value(Val0)],
     Channels1 = lists:keystore(Channel, 1, Channels0, {Channel, Obj}),
-    {noreply, State#state{channels = Channels1}};
+    {noreply, State#state{channels = Channels1,
+			  listeners = Listeners ++ State#state.listeners}};
 
 handle_command({listeners, ReqID, Channel}, _Sender, #state{channels=Channels0, partition=Partition, node=Node} = State) ->
     Res = case lists:keyfind(Channel, 1, Channels0) of
