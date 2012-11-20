@@ -166,7 +166,6 @@ handle_exit(Listener, _Reason, State = #state{channels=Channels0, listeners=List
 					[] ->
 					    lists:keydelete(Channel, 1, Channels1);
 					_ ->
-					    
 					    Obj = howl_obj:update(Val2, Listener, O),
 					    lists:keystore(Channel, 1, Channels1, {Channel, Obj})
 				    end
