@@ -111,6 +111,9 @@ websocket_info(_Info, Req, State) ->
 websocket_terminate(_Reason, _Req, _State) ->
     ok.
 
+handle_json([{<<"token">>, Token}], Req, _State) ->
+    {reply, {text, jsx:encode([{<<"ok">>, <<"authenticated">>}])}, Req, {token, Token}};
+
 handle_json([{<<"auth">>, Auth}], Req, _State) ->
     {<<"user">>, User} = lists:keyfind(<<"user">>, 1, Auth),
     {<<"pass">>, Pass} = lists:keyfind(<<"pass">>, 1, Auth),

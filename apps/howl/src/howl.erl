@@ -5,6 +5,7 @@
 -export([
          ping/0,
 	 listen/1,
+	 listeners/1,
 	 send/2
         ]).
 
@@ -21,11 +22,14 @@ ping() ->
 
 
 listen(Channel) ->
+    ?PRINT({listen, self(), Channel}),
     howl_entity_write_fsm:write({howl_vnode,howl}, Channel, listen, self()).
 
+listeners(Channel) ->
+    howl_entity_read_fsm:start({howl_vnode, howl}, listeners, Channel).
 
 send(Channel, Message) ->
-    case howl_entity_read_fsm:start({howl_vnode, howl}, listeners, Channel) of
+    case listeners(Channel) of
 	{ok, not_found} ->
 	    ok;
 	{ok, Listeners} ->
