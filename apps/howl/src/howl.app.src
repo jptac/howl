@@ -1,8 +1,8 @@
 %% -*- erlang -*-
 {application, howl,
  [
-  {description, ""},
-  {vsn, "1"},
+  {description, "Project FiFo's messanging server."},
+  {vsn, "0.1.0"},
   {registered, []},
   {applications, [
                   kernel,
