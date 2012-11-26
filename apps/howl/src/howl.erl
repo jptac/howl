@@ -2,6 +2,10 @@
 -include("howl.hrl").
 -include_lib("riak_core/include/riak_core_vnode.hrl").
 
+-ifdef(TEST).
+-include_lib("eunit/include/eunit.hrl").
+-endif.
+
 -export([
          ping/0,
 	 listen/1,
@@ -37,3 +41,10 @@ send(Channel, Message) ->
 	    [L ! M || L <- Listeners],
 	    ok
     end.
+
+-ifdef(TEST).
+
+dummy_test() ->
+    ?assertEqual(1, 1).
+
+-endif.
