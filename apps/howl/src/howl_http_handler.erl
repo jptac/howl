@@ -18,7 +18,7 @@ init({_Any, http}, Req, []) ->
 handle(Req, State) ->
     {ok, Req2} = cowboy_http_req:reply(
 		   200, [{'Content-Type', <<"text/html">>}],
-		   
+
 %%% HTML code taken and adepted from cowboy example file which took it from the  misultin's example file.
 		   <<"
 <html>
@@ -67,7 +67,7 @@ handle(Req, State) ->
         };
       } else {
         // browser does not support websockets
-        addStatus('sorry, your browser does not support websockets.'); 
+        addStatus('sorry, your browser does not support websockets.');
       }
     }
     </script>
@@ -118,7 +118,7 @@ handle_json([{<<"auth">>, Auth}], Req, _State) ->
     {<<"user">>, User} = lists:keyfind(<<"user">>, 1, Auth),
     {<<"pass">>, Pass} = lists:keyfind(<<"pass">>, 1, Auth),
     case libsnarl:auth(User, Pass) of
-	{reply, {ok, Token}} ->
+	{ok, Token} ->
 	    {reply, {text, jsx:encode([{<<"ok">>, <<"authenticated">>}])}, Req, Token};
 	_ ->
 	    {reply, {text, jsx:encode([{<<"error">>, <<"authentication failed">>}])}, Req, undefined}
@@ -129,12 +129,12 @@ handle_json(_, Req, undefined) ->
 
 handle_json([{<<"join">>, Channel}], Req, Token) ->
     case libsnarl:allowed(Token, [<<"channel">>, Channel, <<"join">>]) of
-	{reply, true} ->
+        true ->
 	    howl:listen(Channel),
 	    {reply, {text, jsx:encode([{<<"ok">>, <<"channel joined">>}])}, Req, Token};
 	_ ->
 	    {reply, {text, jsx:encode([{<<"error">>, <<"permission denied">>}])}, Req, Token}
-    end;	    
+    end;
 
 handle_json(_JSON, Req, State) ->
     {ok, Req, State}.
