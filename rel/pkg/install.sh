@@ -26,8 +26,12 @@ case $2 in
 	chown -R howl:howl /var/log/howl
 	;;
     POST-INSTALL)
-	echo Importing service ...
-	svccfg import /opt/local/howl/etc/howl.xml
+	if svcs svc:/network/howl:default1 > /dev/null 2&>1
+	    echo Importing service ...
+	    svccfg import /opt/local/howl/etc/howl.xml
+	else
+	    echo Service already existings ...
+	fi
 	echo Trying to guess configuration ...
 	IP=`ifconfig net0 | grep inet | awk -e '{print $2}'`
 	if [ ! -f /opt/local/howl/etc/vm.args ]
