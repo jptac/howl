@@ -26,7 +26,7 @@ case $2 in
 	chown -R howl:howl /var/log/howl
 	;;
     POST-INSTALL)
-	if svcs svc:/network/howl:default > /dev/null 2&>1
+	if svcs svc:/network/howl:default > /dev/null 2>&1
 	then
 	    echo Service already existings ...
 	else
