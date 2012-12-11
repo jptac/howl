@@ -27,6 +27,7 @@ case $2 in
 	;;
     POST-INSTALL)
 	if svcs svc:/network/howl:default1 > /dev/null 2&>1
+	then
 	    echo Importing service ...
 	    svccfg import /opt/local/howl/etc/howl.xml
 	else
