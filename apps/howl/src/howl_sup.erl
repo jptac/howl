@@ -31,7 +31,6 @@ init(_Args) ->
     CoverageFSMs = { howl_entity_coverage_fsm_sup,
 		     { howl_entity_coverage_fsm_sup, start_link, []},
 		    permanent, infinity, supervisor, [howl_entity_coverage_fsm_sup]},
-    
     ReadFSMs = {
       howl_entity_read_fsm_sup,
       {
@@ -40,7 +39,8 @@ init(_Args) ->
 
     Dispatch = [{'_', [{'_', howl_http_handler, []}]}],
     {ok, HTTPPort} = application:get_env(http_port),
-    cowboy:start_listener(chat_listener, 100,
+    {ok, Accpetors} = application:get_env(accpetors),
+    cowboy:start_listener(howl_listener, Accpetors,
 			  cowboy_tcp_transport, [{port, HTTPPort}],
 			  cowboy_http_protocol, [{dispatch, Dispatch}]
 			 ),
