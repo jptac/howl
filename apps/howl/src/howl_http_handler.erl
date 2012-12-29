@@ -112,6 +112,9 @@ websocket_info(_Info, Req, State) ->
 websocket_terminate(_Reason, _Req, _State) ->
     ok.
 
+handle_json([{<<"ping">>, V}], Req, State) ->
+    {reply, {text, jsx:encode([{<<"pong">>, V}])}, Req, State};
+
 handle_json([{<<"token">>, Token}], Req, _State) ->
     {reply, {text, jsx:encode([{<<"ok">>, <<"authenticated">>}])}, Req, {token, Token}};
 
