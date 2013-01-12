@@ -95,7 +95,7 @@ terminate(_Req, _State) ->
 websocket_init(_Any, Req, []) ->
     Req2 = cowboy_http_req:compact(Req),
     {Token, Req3} = cowboy_http_req:cookie(<<"X-Snarl-Token">>, Req2),
-    {ok, Req3, Token, hibernate}.
+    {ok, Req3, {token, Token}, hibernate}.
 
 websocket_handle({text, Raw}, Req, State) ->
     handle_json(jsx:decode(Raw), Req, State);
