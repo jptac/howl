@@ -96,9 +96,9 @@ websocket_init(_Any, Req, []) ->
     Req2 = cowboy_http_req:compact(Req),
     case cowboy_http_req:cookie(<<"X-Snarl-Token">>, Req2) of
         {false, Req3} ->
-                {ok, Req3, {token, Token}, hibernate};
+            {ok, Req3, undefiend, hibernate};
         {Token, Req3} ->
-            {ok, Req3, undefined, hibernate}
+            {ok, Req3, {token, Token}, hibernate}
     end.
 
 websocket_handle({text, Raw}, Req, State) ->
