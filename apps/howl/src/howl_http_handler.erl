@@ -136,7 +136,7 @@ handle_json(_, Req, undefined) ->
     {reply, {text, jsx:encode([{<<"error">>, <<"not authenticated">>}])}, Req, undefined};
 
 handle_json([{<<"join">>, Channel}], Req, Token) ->
-    case libsnarl:allowed(Token, [<<"channel">>, Channel, <<"join">>]) of
+    case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
         true ->
 	    howl:listen(Channel),
 	    {reply, {text, jsx:encode([{<<"ok">>, <<"channel joined">>}])}, Req, Token};
