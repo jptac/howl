@@ -1,4 +1,4 @@
-VERSION=0.1.1
+VERSION=0.1.2
 COMPONENT=howl
 
 .PHONY: build_info package package_list

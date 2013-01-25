@@ -94,8 +94,12 @@ terminate(_Req, _State) ->
 
 websocket_init(_Any, Req, []) ->
     Req2 = cowboy_http_req:compact(Req),
-    {Token, Req3} = cowboy_http_req:cookie(<<"X-Snarl-Token">>, Req2),
-    {ok, Req3, Token, hibernate}.
+    case cowboy_http_req:cookie(<<"X-Snarl-Token">>, Req2) of
+        {false, Req3} ->
+            {ok, Req3, undefiend, hibernate};
+        {Token, Req3} ->
+            {ok, Req3, {token, Token}, hibernate}
+    end.
 
 websocket_handle({text, Raw}, Req, State) ->
     handle_json(jsx:decode(Raw), Req, State);
@@ -132,7 +136,7 @@ handle_json(_, Req, undefined) ->
     {reply, {text, jsx:encode([{<<"error">>, <<"not authenticated">>}])}, Req, undefined};
 
 handle_json([{<<"join">>, Channel}], Req, Token) ->
-    case libsnarl:allowed(Token, [<<"channel">>, Channel, <<"join">>]) of
+    case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
         true ->
 	    howl:listen(Channel),
 	    {reply, {text, jsx:encode([{<<"ok">>, <<"channel joined">>}])}, Req, Token};
