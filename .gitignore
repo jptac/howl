@@ -1,3 +1,4 @@
+*.version
 apps/howl/src/howl_version.hrl
 rel/pkg/packlist
 rel/pkg/*.tgz
