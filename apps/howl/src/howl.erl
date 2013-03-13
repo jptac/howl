@@ -13,7 +13,7 @@
 	 send/2
         ]).
 
--ignore_xref([ping/0]).
+-ignore_xref([ping/0, listeners/1]).
 
 %% Public API
 

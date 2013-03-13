@@ -3,146 +3,102 @@
 -behaviour(cowboy_http_websocket_handler).
 -export([init/3, handle/2, terminate/2]).
 -export([websocket_init/3, websocket_handle/3,
-	 websocket_info/3, websocket_terminate/3]).
+         websocket_info/3, websocket_terminate/3]).
 
 -ignore_xref([websocket_init/3, websocket_handle/3,
-	 websocket_info/3, websocket_terminate/3]).
+              websocket_info/3, websocket_terminate/3]).
+
+-record(state, {token, encoder, decoder, type}).
 
 init({_Any, http}, Req, []) ->
     case cowboy_http_req:header('Upgrade', Req) of
-	{undefined, Req2} -> {ok, Req2, undefined};
-	{<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket};
-	{<<"WebSocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket}
+        {undefined, Req2} -> {ok, Req2, undefined};
+        {<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket};
+        {<<"WebSocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket}
     end.
 
 handle(Req, State) ->
-    {ok, Req2} = cowboy_http_req:reply(
-		   200, [{'Content-Type', <<"text/html">>}],
-
-%%% HTML code taken and adepted from cowboy example file which took it from the  misultin's example file.
-		   <<"
-<html>
-  <head>
-    <script type='text/javascript'>
-    var ws;
-    function addMsg(text){
-      var content = document.getElementById('content');
-      content.innerHTML = content.innerHTML + text + '<br/>';
-      content.lastChild.scrollIntoView();
-    }
-    function send(input, event) {
-      if (event.keyCode == 13) {
-        ws.send(JSON.stringify({join: input.value}));
-        input.value = '';
-      }
-    }
-    function auth(pass, event) {
-      if (event.keyCode == 13) {
-        var user = document.getElementById('user');
-        ws.send(JSON.stringify(
-         {auth: {'user': user.value, 'pass': pass.value}}
-        ));
-       user.value = '';
-       pass.value = '';
-      }
-    }
-
-    function ready(){
-      if ('MozWebSocket' in window) {
-        WebSocket = MozWebSocket;
-      }
-      if ('WebSocket' in window) {
-        // browser supports websockets
-        ws = new WebSocket('ws://' + window.location.host + '/');
-        ws.onopen = function() {
-          addMsg('websocket connected!');
-        };
-        ws.onmessage = function (evt) {
-          var receivedMsg = evt.data;
-          addMsg(receivedMsg);
-        };
-        ws.onclose = function() {
-          // websocket was closed
-          addMsg('websocket was closed');
-        };
-      } else {
-        // browser does not support websockets
-        addStatus('sorry, your browser does not support websockets.');
-      }
-    }
-    </script>
-  </head>
-  <body onload='ready();'>
-  <div id='content' style='overflow:scroll;height:90%'></div>
-
-  <div id='login'>
-    <label>auth</label>
-    <input id='user' type='text' onkeyup='auth(this, event);'/>
-    <input type='text' onkeyup='auth(this, event);'/>
-  </div>
-
-  <div id='input'>
-    <label>Channel</label>
-    <input type='text' onkeyup='send(this, event);'/>
-  </div>
-  </body>
-</html>">>,Req),
-    {ok, Req2, State}.
+    {ok, Req1} =  cowboy_http_req:reply(200, [], <<"">>, Req),
+    {ok, Req1, State}.
 
 terminate(_Req, _State) ->
     ok.
 
 websocket_init(_Any, Req, []) ->
-    Req2 = cowboy_http_req:compact(Req),
-    case cowboy_http_req:cookie(<<"X-Snarl-Token">>, Req2) of
-        {false, Req3} ->
-            {ok, Req3, undefiend, hibernate};
+    {_, C, Req1} = cowboy_http_req:parse_header(<<"Sec-Websocket-Protocol">>, Req, <<"json">>),
+    Req2 = cowboy_http_req:compact(Req1),
+    {Encoder, Decoder, Type} = case C of
+                             <<"msgpack">> ->
+                                 {fun(O) ->
+                                          msgpack:pack(O, [jsx])
+                                  end,
+                                  fun(D) ->
+                                          {ok, O} = msgpack:unpack(D, [jsx]),
+                                          jsxd:from_list(O)
+                                  end,
+                                  binary};
+                             <<"json">> ->
+                                 {fun(O) ->
+                                          jsx:encode(O)
+                                  end,
+                                  fun(D) ->
+                                          jsxd:from_list(jsx:decode(D))
+                                  end, text}
+                         end,
+    case cowboy_http_req:header(<<"X-Snarl-Token">>, Req2) of
+        {undefined, Req3} ->
+            case cowboy_http_req:cookie(<<"X-Snarl-Token">>, Req3) of
+                {false, Req4} ->
+                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder, type = Type}};
+                {Token, Req4} ->
+                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder, type = Type, token = {token, Token}}}
+            end;
         {Token, Req3} ->
-            {ok, Req3, {token, Token}, hibernate}
+            {ok, Req3, #state{encoder = Encoder, decoder = Decoder, type = Type, token = {token, Token}}}
     end.
 
-websocket_handle({text, Raw}, Req, State) ->
-    handle_json(jsx:decode(Raw), Req, State);
+websocket_handle({Type, Raw}, Req, State = #state{type = Type, decoder = Dec}) ->
+    handle_data(Dec(Raw), Req, State);
 
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
-websocket_info({msg, Msg}, Req, State) ->
-    {reply, {text, jsx:encode(Msg)}, Req, State, hibernate};
+websocket_info({msg, Msg}, Req, State = #state{type = Type, encoder = Enc}) ->
+    {reply, {Type, Enc(Msg)}, Req, State};
 
 websocket_info(_Info, Req, State) ->
-    {ok, Req, State, hibernate}.
+    {ok, Req, State}.
 
 websocket_terminate(_Reason, _Req, _State) ->
     ok.
 
-handle_json([{<<"ping">>, V}], Req, State) ->
-    {reply, {text, jsx:encode([{<<"pong">>, V}])}, Req, State};
+handle_data([{<<"ping">>, V}], Req, State = #state{type = Type, encoder = Enc}) ->
+    {reply, {Type, Enc([{<<"pong">>, V}])}, Req, State};
 
-handle_json([{<<"token">>, Token}], Req, _State) ->
-    {reply, {text, jsx:encode([{<<"ok">>, <<"authenticated">>}])}, Req, {token, Token}};
+handle_data([{<<"token">>, Token}], Req, State = #state{type = Type, encoder = Enc}) ->
+    {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = {token, Token}}};
 
-handle_json([{<<"auth">>, Auth}], Req, _State) ->
-    {<<"user">>, User} = lists:keyfind(<<"user">>, 1, Auth),
-    {<<"pass">>, Pass} = lists:keyfind(<<"pass">>, 1, Auth),
+handle_data([{<<"auth">>, Auth}], Req, State = #state{type = Type, encoder = Enc}) ->
+    {ok, User} = jsxd:get([<<"user">>], Auth),
+    {ok, Pass} = jsxd:get([<<"pass">>], Auth),
     case libsnarl:auth(User, Pass) of
-	{ok, Token} ->
-	    {reply, {text, jsx:encode([{<<"ok">>, <<"authenticated">>}])}, Req, Token};
-	_ ->
-	    {reply, {text, jsx:encode([{<<"error">>, <<"authentication failed">>}])}, Req, undefined}
+        {ok, Token} ->
+            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = {token, {token, Token}}}};
+        _ ->
+            {reply, {Type, Enc([{<<"error">>, <<"authentication failed">>}])}, Req, State}
     end;
 
-handle_json(_, Req, undefined) ->
-    {reply, {text, jsx:encode([{<<"error">>, <<"not authenticated">>}])}, Req, undefined};
+handle_data(_, Req, State = #state{type = Type, encoder = Enc, token = undefined}) ->
+    {reply, {Type, Enc([{<<"error">>, <<"not authenticated">>}])}, Req, State};
 
-handle_json([{<<"join">>, Channel}], Req, Token) ->
+handle_data([{<<"join">>, Channel}], Req, State = #state{token = Token, type = Type, encoder = Enc}) ->
     case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
         true ->
-	    howl:listen(Channel),
-	    {reply, {text, jsx:encode([{<<"ok">>, <<"channel joined">>}])}, Req, Token};
-	_ ->
-	    {reply, {text, jsx:encode([{<<"error">>, <<"permission denied">>}])}, Req, Token}
+            howl:listen(Channel),
+            {reply, {Type, Enc([{<<"ok">>, <<"channel joined">>}])}, Req, State};
+        _ ->
+            {reply, {Type, Enc([{<<"error">>, <<"permission denied">>}])}, Req, State}
     end;
 
-handle_json(_JSON, Req, State) ->
+handle_data(_JSON, Req, State) ->
     {ok, Req, State}.
