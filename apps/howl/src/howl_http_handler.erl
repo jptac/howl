@@ -72,32 +72,32 @@ websocket_info(_Info, Req, State) ->
 websocket_terminate(_Reason, _Req, _State) ->
     ok.
 
-handle_data([{<<"ping">>, V}], Req, State) ->
-    {reply, {text, jsx:encode([{<<"pong">>, V}])}, Req, State};
+handle_data([{<<"ping">>, V}], Req, State = #state{type = Type, encoder = Enc}) ->
+    {reply, {Type, Enc([{<<"pong">>, V}])}, Req, State};
 
-handle_data([{<<"token">>, Token}], Req, _State) ->
-    {reply, {text, jsx:encode([{<<"ok">>, <<"authenticated">>}])}, Req, {token, Token}};
+handle_data([{<<"token">>, Token}], Req, State = #state{type = Type, encoder = Enc}) ->
+    {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = Token}};
 
-handle_data([{<<"auth">>, Auth}], Req, _State) ->
+handle_data([{<<"auth">>, Auth}], Req, State = #state{type = Type, encoder = Enc}) ->
     {<<"user">>, User} = lists:keyfind(<<"user">>, 1, Auth),
     {<<"pass">>, Pass} = lists:keyfind(<<"pass">>, 1, Auth),
     case libsnarl:auth(User, Pass) of
         {ok, Token} ->
-            {reply, {text, jsx:encode([{<<"ok">>, <<"authenticated">>}])}, Req, Token};
+            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = Token}};
         _ ->
-            {reply, {text, jsx:encode([{<<"error">>, <<"authentication failed">>}])}, Req, undefined}
+            {reply, {Type, Enc([{<<"error">>, <<"authentication failed">>}])}, Req, State}
     end;
 
-handle_data(_, Req, undefined) ->
-    {reply, {text, jsx:encode([{<<"error">>, <<"not authenticated">>}])}, Req, undefined};
+handle_data(_, Req, State = #state{type = Type, encoder = Enc, token = undefined}) ->
+    {reply, {Type, Enc([{<<"error">>, <<"not authenticated">>}])}, Req, State};
 
-handle_data([{<<"join">>, Channel}], Req, Token) ->
+handle_data([{<<"join">>, Channel}], Req, State = #state{token = Token, type = Type, encoder = Enc}) ->
     case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
         true ->
             howl:listen(Channel),
-            {reply, {text, jsx:encode([{<<"ok">>, <<"channel joined">>}])}, Req, Token};
+            {reply, {Type, Enc([{<<"ok">>, <<"channel joined">>}])}, Req, State};
         _ ->
-            {reply, {text, jsx:encode([{<<"error">>, <<"permission denied">>}])}, Req, Token}
+            {reply, {Type, Enc([{<<"error">>, <<"permission denied">>}])}, Req, State}
     end;
 
 handle_data(_JSON, Req, State) ->
