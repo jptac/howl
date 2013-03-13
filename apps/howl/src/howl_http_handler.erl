@@ -51,10 +51,10 @@ websocket_init(_Any, Req, []) ->
                 {false, Req4} ->
                     {ok, Req4, #state{encoder = Encoder, decoder = Decoder, type = Type}};
                 {Token, Req4} ->
-                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder, type = Type, token = Token}}
+                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder, type = Type, token = {token, Token}}}
             end;
         {Token, Req3} ->
-            {ok, Req3, #state{encoder = Encoder, decoder = Decoder, type = Type, token = Token}}
+            {ok, Req3, #state{encoder = Encoder, decoder = Decoder, type = Type, token = {token, Token}}}
     end.
 
 websocket_handle({Type, Raw}, Req, State = #state{type = Type, decoder = Dec}) ->
@@ -64,10 +64,10 @@ websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
 websocket_info({msg, Msg}, Req, State = #state{type = Type, encoder = Enc}) ->
-    {reply, {Type, Enc(Msg)}, Req, State, hibernate};
+    {reply, {Type, Enc(Msg)}, Req, State};
 
 websocket_info(_Info, Req, State) ->
-    {ok, Req, State, hibernate}.
+    {ok, Req, State}.
 
 websocket_terminate(_Reason, _Req, _State) ->
     ok.
@@ -76,14 +76,14 @@ handle_data([{<<"ping">>, V}], Req, State = #state{type = Type, encoder = Enc}) 
     {reply, {Type, Enc([{<<"pong">>, V}])}, Req, State};
 
 handle_data([{<<"token">>, Token}], Req, State = #state{type = Type, encoder = Enc}) ->
-    {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = Token}};
+    {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = {token, Token}}};
 
 handle_data([{<<"auth">>, Auth}], Req, State = #state{type = Type, encoder = Enc}) ->
-    {<<"user">>, User} = lists:keyfind(<<"user">>, 1, Auth),
-    {<<"pass">>, Pass} = lists:keyfind(<<"pass">>, 1, Auth),
+    {ok, User} = jsxd:get([<<"user">>], Auth),
+    {ok, Pass} = jsxd:get([<<"pass">>], Auth),
     case libsnarl:auth(User, Pass) of
         {ok, Token} ->
-            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = Token}};
+            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = {token, {token, Token}}}};
         _ ->
             {reply, {Type, Enc([{<<"error">>, <<"authentication failed">>}])}, Req, State}
     end;
