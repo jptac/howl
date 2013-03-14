@@ -8,9 +8,10 @@
 
 -export([
          ping/0,
-	 listen/1,
-	 listeners/1,
-	 send/2
+         listen/1,
+         leave/1,
+         listeners/1,
+         send/2
         ]).
 
 -ignore_xref([ping/0, listeners/1]).
@@ -24,9 +25,10 @@ ping() ->
     [{IndexNode, _Type}] = PrefList,
     riak_core_vnode_master:sync_spawn_command(IndexNode, ping, howl_vnode_master).
 
+leave(Channel) ->
+    howl_entity_write_fsm:write({howl_vnode,howl}, Channel, leave, self()).
 
 listen(Channel) ->
-    ?PRINT({listen, self(), Channel}),
     howl_entity_write_fsm:write({howl_vnode,howl}, Channel, listen, self()).
 
 listeners(Channel) ->
@@ -34,12 +36,12 @@ listeners(Channel) ->
 
 send(Channel, Message) ->
     case listeners(Channel) of
-	{ok, not_found} ->
-	    ok;
-	{ok, Listeners} ->
-	    M = {msg, [{<<"channel">>, Channel}, {<<"message">>, Message}]},
-	    [L ! M || L <- Listeners],
-	    ok
+        {ok, not_found} ->
+            ok;
+        {ok, Listeners} ->
+            M = {msg, [{<<"channel">>, Channel}, {<<"message">>, Message}]},
+            [L ! M || L <- Listeners],
+            ok
     end.
 
 -ifdef(TEST).
