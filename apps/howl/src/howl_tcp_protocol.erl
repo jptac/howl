@@ -19,6 +19,10 @@ message({msg, Channel, Msg}, State) ->
     howl:send(Channel, Msg),
     {stop, normal, State};
 
+message({msg, Msgs}, State) ->
+    [howl:send(Channel, Msg) || {Channel, Msg} <- Msgs],
+    {stop, normal, State};
+
 message(version, State) ->
     {stop, normal, ?VERSION, State};
 

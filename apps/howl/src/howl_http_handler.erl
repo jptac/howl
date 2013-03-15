@@ -100,5 +100,16 @@ handle_data([{<<"join">>, Channel}], Req, State = #state{token = Token, type = T
             {reply, {Type, Enc([{<<"error">>, <<"permission denied">>}])}, Req, State}
     end;
 
+
+handle_data([{<<"leave">>, Channel}], Req, State = #state{token = Token, type = Type, encoder = Enc}) ->
+    case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
+        true ->
+            howl:leave(Channel),
+            {reply, {Type, Enc([{<<"ok">>, <<"channel left">>}])}, Req, State};
+        _ ->
+            {reply, {Type, Enc([{<<"error">>, <<"permission denied">>}])}, Req, State}
+    end;
+
+
 handle_data(_JSON, Req, State) ->
     {ok, Req, State}.
