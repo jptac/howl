@@ -20,12 +20,13 @@
          handle_coverage/4,
          handle_exit/3]).
 
--export([listen/4, listeners/3]).
+-export([leave/4, listen/4, listeners/3]).
 
 
 -ignore_xref([
               start_vnode/1,
               listen/4,
+              leave/4,
               listeners/3
              ]).
 
@@ -50,6 +51,12 @@ init([Partition]) ->
 listen(Preflist, ReqID, Channel, Listener) ->
     riak_core_vnode_master:command(Preflist,
                                    {listen, ReqID, Channel, Listener},
+                                   {fsm, undefined, self()},
+                                   ?MASTER).
+
+leave(Preflist, ReqID, Channel, Listener) ->
+    riak_core_vnode_master:command(Preflist,
+                                   {leave, ReqID, Channel, Listener},
                                    {fsm, undefined, self()},
                                    ?MASTER).
 
@@ -103,6 +110,28 @@ handle_command({listen, {ReqID, Coordinator}, Channel, Listener}, _Sender,
                                              listeners=[{Listener, Channel}|Listeners0]}}
     end;
 
+handle_command({leave, {ReqID, Coordinator}, Channel, Listener}, _Sender,
+               #state{channels = Channels0,
+                      listeners = Listeners0} = State) ->
+    Listeners1 = lists:delete({Listener, Channel}, Listeners0),
+    Channels1 = case lists:keyfind(Channel, 1, Channels0) of
+                    {Channel, #howl_obj{val=Val0} = O} ->
+                        Val1 = statebox:modify({fun howl_entity_state:remove/2, [Listener]}, Val0),
+                        Val2 = statebox:expire(?STATEBOX_EXPIRE, Val1),
+                        case statebox:value(Val2) of
+                            [] ->
+                                lists:keydelete(Channel, 1, Channels0);
+                            _ ->
+                                Obj = howl_obj:update(Val2, Coordinator, O),
+                                lists:keystore(Channel, 1, Channels0, {Channel, Obj})
+                        end;
+                    _ ->
+                        Channels0
+                end,
+    {reply, {ok, ReqID}, State#state{channels=Channels1,
+                                     listeners=Listeners1}};
+
+
 handle_command(Message, _Sender, State) ->
     ?PRINT({unhandled_command, Message}),
     {noreply, State}.
@@ -148,8 +177,13 @@ delete(State) ->
 handle_coverage(_Req, _KeySpaces, _Sender, State) ->
     {stop, not_implemented, State}.
 
-handle_exit(Listener, _Reason, State = #state{channels=Channels0, listeners=Listeners}) ->
-    io:format("~p~n", [Listeners]),
+handle_exit(Listener, _Reason, State) ->
+    {noreply,delete_listener(Listener, State)}.
+
+terminate(_Reason, _State) ->
+    ok.
+
+delete_listener(Listener, State = #state{channels=Channels0, listeners=Listeners}) ->
     {ToDelete, Listeners1} = lists:partition(fun ({AListener, _}) ->
                                                      case AListener of
                                                          Listener ->
@@ -174,8 +208,5 @@ handle_exit(Listener, _Reason, State = #state{channels=Channels0, listeners=List
                                             Channels1
                                     end
                             end, Channels0, ToDelete),
-    {noreply, State#state{listeners = Listeners1,
-                          channels = Channels2}}.
-
-terminate(_Reason, _State) ->
-    ok.
+    State#state{listeners = Listeners1,
+                channels = Channels2}.

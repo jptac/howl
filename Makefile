@@ -23,7 +23,7 @@ clean:
 distclean: clean devclean relclean
 	$(REBAR) delete-deps
 
-test: all
+test: all xref
 	$(REBAR) skip_deps=true eunit
 
 rel: all

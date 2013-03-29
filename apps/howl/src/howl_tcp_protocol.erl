@@ -1,13 +1,15 @@
 -module(howl_tcp_protocol).
 
--export([init/1, message/2]).
+-export([init/2, message/2]).
 
--ignore_xref([init/1, message/2]).
+-ignore_xref([init/2, message/2]).
 
 -include("howl_version.hrl").
 
-init([]) ->
-    {ok, stateless}.
+-record(state, {port}).
+
+init(Prot, []) ->
+    {ok, #state{port = Prot}}.
 
 %%%===================================================================
 %%%  VM Functions
@@ -15,10 +17,14 @@ init([]) ->
 
 message({msg, Channel, Msg}, State) ->
     howl:send(Channel, Msg),
-    {noreply, State};
+    {stop, normal, State};
+
+message({msg, Msgs}, State) ->
+    [howl:send(Channel, Msg) || {Channel, Msg} <- Msgs],
+    {stop, normal, State};
 
 message(version, State) ->
-    {reply, ?VERSION, State};
+    {stop, normal, ?VERSION, State};
 
 message(Oops, State) ->
     io:format("oops: ~p~n", [Oops]),
