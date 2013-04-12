@@ -8,7 +8,7 @@ RUNNER_BASE_DIR=${RUNNER_SCRIPT_DIR%/*}
 RUNNER_ETC_DIR=$RUNNER_BASE_DIR/etc
 RUNNER_LOG_DIR=/var/log/howl
 # Note the trailing slash on $PIPE_DIR/
-PIPE_DIR=/tmp/howl
+PIPE_DIR=/tmp/howl/
 RUNNER_USER=
 
 # Make sure this script is running as the appropriate user
@@ -121,6 +121,11 @@ case "$1" in
     console|console_clean)
         # .boot file typically just $SCRIPT (ie, the app name)
         # however, for debugging, sometimes start_clean.boot is useful:
+        RES=`$NODETOOL ping`
+        if [ "$RES" = "pong" ]; then
+            echo "Node is already running!"
+            exit 1
+        fi
         case "$1" in
             console)        BOOTFILE=$SCRIPT ;;
             console_clean)  BOOTFILE=start_clean ;;
