@@ -77,7 +77,11 @@ websocket_info({msg, Msg}, Req, State = #state{type = Type, encoder = Enc}) ->
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
-websocket_terminate(_Reason, _Req, _State) ->
+websocket_terminate(normal, _Req, _State) ->
+    ok;
+
+websocket_terminate(Reason, _Req, State) ->
+    lager:warning("terminating websocket with reason ~p when state was ~p.", [Reason, State]),
     ok.
 
 handle_data([{<<"ping">>, V}], Req, State = #state{type = Type, encoder = Enc}) ->

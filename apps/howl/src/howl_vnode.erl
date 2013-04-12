@@ -106,7 +106,7 @@ handle_command({listen, {ReqID, Coordinator}, Channel, Listener}, _Sender,
             VC = vclock:increment(Coordinator, VC0),
             Obj = #howl_obj{val=Val1, vclock=VC},
             Channels1 = [{Channel, Obj}|Channels0],
-            link(Listener),
+            riak_core_vnode:monitor({raw, not_sure_what_this_is_argument_is_for, Listener}),
             {reply, {ok, ReqID}, State#state{channels=Channels1,
                                              listeners=[{Listener, Channel}|Listeners0]}};
         {Channel, #howl_obj{val=Val0} = O} ->
@@ -114,7 +114,7 @@ handle_command({listen, {ReqID, Coordinator}, Channel, Listener}, _Sender,
             Val2 = statebox:expire(?STATEBOX_EXPIRE, Val1),
             Obj = howl_obj:update(Val2, Coordinator, O),
             Channels1 = lists:keystore(Channel, 1, Channels0, {Channel, Obj}),
-            link(Listener),
+            riak_core_vnode:monitor({raw, not_sure_what_this_is_argument_is_for, Listener}),
             {reply, {ok, ReqID}, State#state{channels=Channels1,
                                              listeners=[{Listener, Channel}|Listeners0]}}
     end;
