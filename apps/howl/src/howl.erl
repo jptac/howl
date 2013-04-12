@@ -29,6 +29,7 @@ leave(Channel) ->
     howl_entity_write_fsm:write({howl_vnode,howl}, Channel, leave, self()).
 
 listen(Channel) ->
+    lager:info("[~s] join ~p.", [Channel, self()]),
     howl_entity_write_fsm:write({howl_vnode,howl}, Channel, listen, self()).
 
 listeners(Channel) ->

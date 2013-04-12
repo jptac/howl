@@ -28,23 +28,31 @@ websocket_init(_Any, Req, []) ->
     {_, C, Req1} = cowboy_http_req:parse_header(<<"Sec-Websocket-Protocol">>, Req, <<"json">>),
     Req2 = cowboy_http_req:compact(Req1),
     {Encoder, Decoder, Type} = case C of
-                             <<"msgpack">> ->
-                                 {fun(O) ->
-                                          msgpack:pack(O, [jsx])
-                                  end,
-                                  fun(D) ->
-                                          {ok, O} = msgpack:unpack(D, [jsx]),
-                                          jsxd:from_list(O)
-                                  end,
-                                  binary};
-                             <<"json">> ->
-                                 {fun(O) ->
-                                          jsx:encode(O)
-                                  end,
-                                  fun(D) ->
-                                          jsxd:from_list(jsx:decode(D))
-                                  end, text}
-                         end,
+                                   <<"msgpack">> ->
+                                       {fun(O) ->
+                                                msgpack:pack(O, [jsx])
+                                        end,
+                                        fun(D) ->
+                                                {ok, O} = msgpack:unpack(D, [jsx]),
+                                                jsxd:from_list(O)
+                                        end,
+                                        binary};
+                                   <<"json">> ->
+                                       {fun(O) ->
+                                                jsx:encode(O)
+                                        end,
+                                        fun(D) ->
+                                                jsxd:from_list(jsx:decode(D))
+                                        end, text};
+                                   <<>> ->
+                                       {fun(O) ->
+                                                jsx:encode(O)
+                                        end,
+                                        fun(D) ->
+                                                jsxd:from_list(jsx:decode(D))
+                                        end, text}
+
+                               end,
     case cowboy_http_req:header(<<"X-Snarl-Token">>, Req2) of
         {undefined, Req3} ->
             case cowboy_http_req:cookie(<<"X-Snarl-Token">>, Req3) of
@@ -83,7 +91,7 @@ handle_data([{<<"auth">>, Auth}], Req, State = #state{type = Type, encoder = Enc
     {ok, Pass} = jsxd:get([<<"pass">>], Auth),
     case libsnarl:auth(User, Pass) of
         {ok, Token} ->
-            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = {token, {token, Token}}}};
+            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token =  Token}};
         _ ->
             {reply, {Type, Enc([{<<"error">>, <<"authentication failed">>}])}, Req, State}
     end;
