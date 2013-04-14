@@ -12,12 +12,8 @@
 
 -record(state, {token, encoder, decoder, type}).
 
-init({_Any, http}, Req, []) ->
-    case cowboy_req:header(<<"Upgrade">>, Req) of
-        {undefined, Req2} -> {ok, Req2, undefined};
-        {<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket};
-        {<<"WebSocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket}
-    end.
+init({_Andy, http}, _Req, _Opts) ->
+    {upgrade, protocol, cowboy_websocket}.
 
 handle(Req, State) ->
     {ok, Req1} =  cowboy_req:reply(200, [], <<"">>, Req),
