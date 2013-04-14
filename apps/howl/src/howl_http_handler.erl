@@ -2,7 +2,7 @@
 
 -behaviour(cowboy_websocket_handler).
 
--export([init/3, handle/2, terminate/2]).
+-export([init/3, handle/2, terminate/3]).
 -export([websocket_init/3, websocket_handle/3,
          websocket_info/3, websocket_terminate/3]).
 
@@ -23,7 +23,7 @@ handle(Req, State) ->
     {ok, Req1} =  cowboy_req:reply(200, [], <<"">>, Req),
     {ok, Req1, State}.
 
-terminate(_Req, _State) ->
+terminate(_Reason, _Req, _State) ->
     ok.
 
 websocket_init(_Any, Req, []) ->
