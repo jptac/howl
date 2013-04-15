@@ -10,6 +10,14 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+    Dispatch = cowboy_router:compile([{'_', [{'_', howl_http_handler, []}]}]),
+
+    {ok, HTTPPort} = application:get_env(http_port),
+    {ok, Acceptors} = application:get_env(accpetors),
+
+
+    {ok, _} = cowboy:start_http(http, Acceptors, [{port, HTTPPort}],
+                                [{env, [{dispatch, Dispatch}]}]),
     case howl_sup:start_link() of
         {ok, Pid} ->
             ok = riak_core:register([{vnode_module, howl_vnode}]),
