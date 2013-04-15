@@ -2,7 +2,8 @@
 
 -behaviour(cowboy_websocket_handler).
 
--export([init/3, handle/2, terminate/3]).
+-export([init/3]).
+
 -export([websocket_init/3, websocket_handle/3,
          websocket_info/3, websocket_terminate/3]).
 
@@ -15,15 +16,8 @@
 init({_Andy, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
-handle(Req, State) ->
-    {ok, Req1} =  cowboy_req:reply(200, [], <<"">>, Req),
-    {ok, Req1, State}.
-
-terminate(_Reason, _Req, _State) ->
-    ok.
-
 websocket_init(_Any, Req, []) ->
-    {_, C, Req0} = cowboy_req:parse_header(<<"Sec-Websocket-Protocol">>, Req, <<"json">>),
+    {_, C, Req0} = cowboy_req:parse_header(<<"sec-websocket-protocol">>, Req, <<"json">>),
     Req1 = cowboy_req:compact(Req0),
     {Encoder, Decoder, Type} = case C of
                                    <<"msgpack">> ->
@@ -51,9 +45,9 @@ websocket_init(_Any, Req, []) ->
                                         end, text}
 
                                end,
-    case cowboy_req:header(<<"X-Snarl-Token">>, Req1) of
+    case cowboy_req:header(<<"x-snarl-token">>, Req1) of
         {undefined, Req2} ->
-            case cowboy_req:cookie(<<"X-Snarl-Token">>, Req2) of
+            case cowboy_req:cookie(<<"x-snarl-token">>, Req2) of
                 {undefined, Req3} ->
                     {ok, Req3, #state{encoder = Encoder, decoder = Decoder, type = Type}};
                 {Token, Req3} ->
