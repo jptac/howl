@@ -24,7 +24,7 @@ message({msg, Msgs}, State) ->
     {stop, normal, State};
 
 message(version, State) ->
-    {stop, normal, ?VERSION, State};
+    {stop, normal, {ok, ?VERSION}, State};
 
 message(Oops, State) ->
     io:format("oops: ~p~n", [Oops]),
