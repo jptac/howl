@@ -11,6 +11,7 @@
          handle_command/3,
          is_empty/1,
          delete/1,
+         repair/4,
          handle_handoff_command/3,
          handoff_starting/2,
          handoff_cancelled/1,
@@ -27,6 +28,7 @@
               start_vnode/1,
               listen/4,
               leave/4,
+              repair/4,
               listeners/3
              ]).
 
@@ -47,6 +49,11 @@ init([Partition]) ->
                   channels = [],
                   listeners = []}}.
 
+repair(IdxNode, Channel, VClock, Obj) ->
+    riak_core_vnode_master:command(IdxNode,
+                                   {repair, Channel, VClock, Obj},
+                                   ignore,
+                                   ?MASTER).
 
 listen(Preflist, ReqID, Channel, Listener) ->
     riak_core_vnode_master:command(Preflist,
@@ -70,7 +77,7 @@ listeners(Preflist, ReqID, Channel) ->
 handle_command(ping, _Sender, State) ->
     {reply, {pong, State#state.partition}, State};
 
-handle_command({repair, undefined, Channel, #howl_obj{val=Val0} = Obj}, _Sender,
+handle_command({repair, Channel, _VClock, #howl_obj{val=Val0} = Obj}, _Sender,
                #state{channels=Channels0}=State) ->
     Listeners = [{L, Channel} || L <- statebox:value(Val0)],
     Channels1 = lists:keystore(Channel, 1, Channels0, {Channel, Obj}),
@@ -97,7 +104,7 @@ handle_command({listen, {ReqID, Coordinator}, Channel, Listener}, _Sender,
             VC = vclock:increment(Coordinator, VC0),
             Obj = #howl_obj{val=Val1, vclock=VC},
             Channels1 = [{Channel, Obj}|Channels0],
-            link(Listener),
+            riak_core_vnode:monitor({raw, erlang:make_ref(), Listener}),
             {reply, {ok, ReqID}, State#state{channels=Channels1,
                                              listeners=[{Listener, Channel}|Listeners0]}};
         {Channel, #howl_obj{val=Val0} = O} ->
@@ -105,7 +112,7 @@ handle_command({listen, {ReqID, Coordinator}, Channel, Listener}, _Sender,
             Val2 = statebox:expire(?STATEBOX_EXPIRE, Val1),
             Obj = howl_obj:update(Val2, Coordinator, O),
             Channels1 = lists:keystore(Channel, 1, Channels0, {Channel, Obj}),
-            link(Listener),
+            riak_core_vnode:monitor({raw, erlang:make_ref(), Listener}),
             {reply, {ok, ReqID}, State#state{channels=Channels1,
                                              listeners=[{Listener, Channel}|Listeners0]}}
     end;
@@ -137,7 +144,9 @@ handle_command(Message, _Sender, State) ->
     {noreply, State}.
 
 handle_handoff_command(?FOLD_REQ{foldfun=Fun, acc0=Acc0}, _Sender, State) ->
-    Acc = lists:foldl(Fun, Acc0, State#state.listeners),
+    Acc = lists:foldl(fun ({C, Ls}, AccIn) ->
+                              Fun(C, Ls, AccIn)
+                      end, Acc0, State#state.channels),
     {reply, Acc, State};
 
 handle_handoff_command(_Message, _Sender, State) ->

@@ -1,60 +1,60 @@
 -module(howl_http_handler).
--behaviour(cowboy_http_handler).
--behaviour(cowboy_http_websocket_handler).
--export([init/3, handle/2, terminate/2]).
+
+-behaviour(cowboy_websocket_handler).
+
+-export([init/3]).
+
 -export([websocket_init/3, websocket_handle/3,
          websocket_info/3, websocket_terminate/3]).
 
 -ignore_xref([websocket_init/3, websocket_handle/3,
               websocket_info/3, websocket_terminate/3]).
+-ignore_xref([init/3, handle/2, terminate/2]).
 
 -record(state, {token, encoder, decoder, type}).
 
-init({_Any, http}, Req, []) ->
-    case cowboy_http_req:header('Upgrade', Req) of
-        {undefined, Req2} -> {ok, Req2, undefined};
-        {<<"websocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket};
-        {<<"WebSocket">>, _Req2} -> {upgrade, protocol, cowboy_http_websocket}
-    end.
-
-handle(Req, State) ->
-    {ok, Req1} =  cowboy_http_req:reply(200, [], <<"">>, Req),
-    {ok, Req1, State}.
-
-terminate(_Req, _State) ->
-    ok.
+init({_Andy, http}, _Req, _Opts) ->
+    {upgrade, protocol, cowboy_websocket}.
 
 websocket_init(_Any, Req, []) ->
-    {_, C, Req1} = cowboy_http_req:parse_header(<<"Sec-Websocket-Protocol">>, Req, <<"json">>),
-    Req2 = cowboy_http_req:compact(Req1),
+    {_, [C], Req0} = cowboy_req:parse_header(<<"sec-websocket-protocol">>, Req, <<"json">>),
+    Req1 = cowboy_req:compact(Req0),
     {Encoder, Decoder, Type} = case C of
-                             <<"msgpack">> ->
-                                 {fun(O) ->
-                                          msgpack:pack(O, [jsx])
-                                  end,
-                                  fun(D) ->
-                                          {ok, O} = msgpack:unpack(D, [jsx]),
-                                          jsxd:from_list(O)
-                                  end,
-                                  binary};
-                             <<"json">> ->
-                                 {fun(O) ->
-                                          jsx:encode(O)
-                                  end,
-                                  fun(D) ->
-                                          jsxd:from_list(jsx:decode(D))
-                                  end, text}
-                         end,
-    case cowboy_http_req:header(<<"X-Snarl-Token">>, Req2) of
-        {undefined, Req3} ->
-            case cowboy_http_req:cookie(<<"X-Snarl-Token">>, Req3) of
-                {false, Req4} ->
-                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder, type = Type}};
-                {Token, Req4} ->
-                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder, type = Type, token = {token, Token}}}
+                                   <<"msgpack">> ->
+                                       {fun(O) ->
+                                                msgpack:pack(O, [jsx])
+                                        end,
+                                        fun(D) ->
+                                                {ok, O} = msgpack:unpack(D, [jsx]),
+                                                jsxd:from_list(O)
+                                        end,
+                                        binary};
+                                   <<"json">> ->
+                                       {fun(O) ->
+                                                jsx:encode(O)
+                                        end,
+                                        fun(D) ->
+                                                jsxd:from_list(jsx:decode(D))
+                                        end, text};
+                                   <<>> ->
+                                       {fun(O) ->
+                                                jsx:encode(O)
+                                        end,
+                                        fun(D) ->
+                                                jsxd:from_list(jsx:decode(D))
+                                        end, text}
+
+                               end,
+    case cowboy_req:header(<<"x-snarl-token">>, Req1) of
+        {undefined, Req2} ->
+            case cowboy_req:cookie(<<"x-snarl-token">>, Req2) of
+                {undefined, Req3} ->
+                    {ok, Req3, #state{encoder = Encoder, decoder = Decoder, type = Type}};
+                {Token, Req3} ->
+                    {ok, Req3, #state{encoder = Encoder, decoder = Decoder, type = Type, token = {token, Token}}}
             end;
-        {Token, Req3} ->
-            {ok, Req3, #state{encoder = Encoder, decoder = Decoder, type = Type, token = {token, Token}}}
+        {Token, Req2} ->
+            {ok, Req2, #state{encoder = Encoder, decoder = Decoder, type = Type, token = {token, Token}}}
     end.
 
 websocket_handle({Type, Raw}, Req, State = #state{type = Type, decoder = Dec}) ->
@@ -69,7 +69,11 @@ websocket_info({msg, Msg}, Req, State = #state{type = Type, encoder = Enc}) ->
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
-websocket_terminate(_Reason, _Req, _State) ->
+websocket_terminate(normal, _Req, _State) ->
+    ok;
+
+websocket_terminate(Reason, _Req, State) ->
+    lager:warning("terminating websocket with reason ~p when state was ~p.", [Reason, State]),
     ok.
 
 handle_data([{<<"ping">>, V}], Req, State = #state{type = Type, encoder = Enc}) ->
@@ -83,7 +87,7 @@ handle_data([{<<"auth">>, Auth}], Req, State = #state{type = Type, encoder = Enc
     {ok, Pass} = jsxd:get([<<"pass">>], Auth),
     case libsnarl:auth(User, Pass) of
         {ok, Token} ->
-            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token = {token, {token, Token}}}};
+            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req, State#state{token =  Token}};
         _ ->
             {reply, {Type, Enc([{<<"error">>, <<"authentication failed">>}])}, Req, State}
     end;
