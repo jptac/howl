@@ -17,11 +17,11 @@ init(Prot, []) ->
 
 message({msg, Channel, Msg}, State) ->
     howl:send(Channel, Msg),
-    {reply, State};
+    {noreply, State};
 
 message({msg, Msgs}, State) ->
     [howl:send(Channel, Msg) || {Channel, Msg} <- Msgs],
-    {reply, State};
+    {noreply, State};
 
 message(version, State) ->
     {reply, {ok, ?VERSION}, State};
