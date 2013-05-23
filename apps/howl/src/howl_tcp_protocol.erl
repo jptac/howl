@@ -17,14 +17,14 @@ init(Prot, []) ->
 
 message({msg, Channel, Msg}, State) ->
     howl:send(Channel, Msg),
-    {stop, normal, State};
+    {reply, State};
 
 message({msg, Msgs}, State) ->
     [howl:send(Channel, Msg) || {Channel, Msg} <- Msgs],
-    {stop, normal, State};
+    {reply, State};
 
 message(version, State) ->
-    {stop, normal, {ok, ?VERSION}, State};
+    {reply, {ok, ?VERSION}, State};
 
 message(Oops, State) ->
     io:format("oops: ~p~n", [Oops]),
