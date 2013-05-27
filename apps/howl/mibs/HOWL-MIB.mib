@@ -1,0 +1,448 @@
+-- 1.3.6.1.4.1
+HOWL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        experimental   FROM RFC1155-SMI
+        RowStatus      FROM STANDARD-MIB
+        DisplayString  FROM RFC1213-MIB
+        OBJECT-TYPE    FROM RFC-1212
+        enterprises    FROM SNMPv2-SMI
+        ;
+
+    fifo         OBJECT IDENTIFIER ::= { enterprises 41822 }
+-- Group section
+    howl         OBJECT IDENTIFIER ::= { fifo 4 }
+
+    channel     OBJECT IDENTIFIER ::= { howl  4 }
+    delivery    OBJECT IDENTIFIER ::= { howl  5 }
+
+-- General section.
+    name OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "My own name"
+        ::= { howl 1 }
+
+    version OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "howl version"
+        ::= { howl 2 }
+
+    ringStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "ring status"
+        ::= { howl 3 }
+
+-- group Section
+
+    channelReadP999 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99.9 percertile"
+        ::= { channel 1 }
+
+    channelReadP99 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99 percertile"
+        ::= { channel 2 }
+
+    channelReadP95 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "95 percertile"
+        ::= { channel 3 }
+
+    channelReadP75 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "75 percertile"
+        ::= { channel 4 }
+
+    channelReadP25 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "25 percertile"
+        ::= { channel 5 }
+
+    channelReadCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 6 }
+
+    channelReadMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 7 }
+
+    channelReadMedian OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 8 }
+
+    channelReadMean OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 9 }
+
+    channelReadMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 10 }
+
+    channelWriteP999 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99.9 percertile"
+        ::= { channel 11 }
+
+    channelWriteP99 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99 percertile"
+        ::= { channel 12 }
+
+    channelWriteP95 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "95 percertile"
+        ::= { channel 13 }
+
+    channelWriteP75 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "75 percertile"
+        ::= { channel 14 }
+
+    channelWriteP25 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "25 percertile"
+        ::= { channel 15 }
+
+    channelWriteCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 16 }
+
+    channelWriteMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 17 }
+
+    channelWriteMedian OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 18 }
+
+    channelWriteMean OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 19 }
+
+    channelWriteMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 20 }
+
+    channelListP999 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99.9 percertile"
+        ::= { channel 21 }
+
+    channelListP99 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99 percertile"
+        ::= { channel 22 }
+
+    channelListP95 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "95 percertile"
+        ::= { channel 23 }
+
+    channelListP75 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "75 percertile"
+        ::= { channel 24 }
+
+    channelListP25 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "25 percertile"
+        ::= { channel 25 }
+
+    channelListCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 26 }
+
+    channelListMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 27 }
+
+    channelListMedian OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 28 }
+
+    channelListMean OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 29 }
+
+    channelListMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 30 }
+
+    channelRepairP999 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99.9 percertile"
+        ::= { channel 31 }
+
+    channelRepairP99 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99 percertile"
+        ::= { channel 32 }
+
+    channelRepairP95 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "95 percertile"
+        ::= { channel 33 }
+
+    channelRepairP75 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "75 percertile"
+        ::= { channel 34 }
+
+    channelRepairP25 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "25 percertile"
+        ::= { channel 35 }
+
+    channelRepairCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 36 }
+
+    channelRepairMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 37 }
+
+    channelRepairMedian OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 38 }
+
+    channelRepairMean OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 39 }
+
+    channelRepairMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { channel 40 }
+
+-- delivery Section
+
+    deliveryP999 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99.9 percertile"
+        ::= { delivery 1 }
+
+    deliveryP99 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "99 percertile"
+        ::= { delivery 2 }
+
+    deliveryP95 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "95 percertile"
+        ::= { delivery 3 }
+
+    deliveryP75 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "75 percertile"
+        ::= { delivery 4 }
+
+    deliveryP25 OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "25 percertile"
+        ::= { delivery 5 }
+
+    deliveryCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { delivery 6 }
+
+    deliveryMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { delivery 7 }
+
+    deliveryMedian OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { delivery 8 }
+
+    deliveryMean OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { delivery 9 }
+
+    deliveryMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "number of events"
+        ::= { delivery 10 }
+
+END

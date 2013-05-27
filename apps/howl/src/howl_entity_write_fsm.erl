@@ -26,7 +26,7 @@
               start_link/6,
               terminate/3,
               waiting/2,
-	      write/3
+              write/3
              ]).
 
 %% States
@@ -47,12 +47,13 @@
 %% num_w: The number of successful write replies.
 -record(state, {req_id :: pos_integer(),
                 from :: pid(),
-		entity :: string(),
+                entity :: string(),
                 op :: atom(),
-		w,
-		n,
-		vnode,
-		system,
+                w,
+                n,
+                start,
+                vnode,
+                system,
                 cordinator :: node(),
                 val = undefined :: term() | undefined,
                 preflist :: riak_core_apl:preflist2(),
@@ -75,17 +76,17 @@ write({VNode, System}, User, Op, Val) ->
     ReqID = mk_reqid(),
     howl_entity_write_fsm_sup:start_write_fsm([{VNode, System}, ReqID, self(), User, Op, Val]),
     receive
-	{ReqID, ok} -> 
-	    ok;
-        {ReqID, ok, Result} -> 
-	    {ok, Result};
-	Other -> 
-	    ?PRINT({yuck, Other})
+        {ReqID, ok} ->
+            ok;
+        {ReqID, ok, Result} ->
+            {ok, Result};
+        Other ->
+            ?PRINT({yuck, Other})
     after ?DEFAULT_TIMEOUT ->
-	    {error, timeout}
+            {error, timeout}
     end.
 
-mk_reqid() -> 
+mk_reqid() ->
     erlang:phash2(erlang:now()).
 
 %%%===================================================================
@@ -96,29 +97,30 @@ mk_reqid() ->
 init([{VNode, System}, ReqID, From, Entity, Op, Val]) ->
     ?PRINT({init, {VNode, System}, ReqID}),
     {N, _R, W} = case application:get_key(System) of
-		     {ok, Res} ->
-			 Res;
-		     undefined ->
-			 {?N, ?R, ?W}
-		 end,
+                     {ok, Res} ->
+                         Res;
+                     undefined ->
+                         {?N, ?R, ?W}
+                 end,
     SD = #state{req_id=ReqID,
-		n=N,
-		w=W,
+                n=N,
+                w=W,
                 from=From,
                 entity=Entity,
                 op=Op,
-		vnode=VNode,
-		system=System,
+                start=now(),
+                vnode=VNode,
+                system=System,
                 cordinator=node(),
                 val=Val},
     {ok, prepare, SD, 0}.
 
 %% @doc Prepare the write by calculating the _preference list_.
 prepare(timeout, SD0=#state{
-		   entity=Entity,
-		   system=System,
-		   n=N
-		  }) ->
+                        entity=Entity,
+                        system=System,
+                        n=N
+                       }) ->
     Bucket = list_to_binary(atom_to_list(System)),
     DocIdx = riak_core_util:chash_key({Bucket, term_to_binary(Entity)}),
     Preflist = riak_core_apl:get_apl(DocIdx, N, System),
@@ -131,7 +133,7 @@ execute(timeout, SD0=#state{req_id=ReqID,
                             entity=Entity,
                             op=Op,
                             val=Val,
-			    vnode=VNode,
+                            vnode=VNode,
                             cordinator=Cordinator,
                             preflist=Preflist}) ->
     case Val of
@@ -148,6 +150,9 @@ waiting({ok, ReqID}, SD0=#state{from=From, num_w=NumW0, req_id=ReqID, w=W}) ->
     SD = SD0#state{num_w=NumW},
     if
         NumW =:= W ->
+            statman_histogram:record_value(
+              {<<"channel/write">>, total},
+              SD0#state.start),
             From ! {ReqID, ok},
             {stop, normal, SD};
         true -> {next_state, waiting, SD}
@@ -172,7 +177,7 @@ handle_event(_Event, _StateName, StateData) ->
 handle_sync_event(_Event, _From, _StateName, StateData) ->
     {stop,badmsg,StateData}.
 
-code_change(_OldVsn, StateName, State, _Extra) -> 
+code_change(_OldVsn, StateName, State, _Extra) ->
     {ok, StateName, State}.
 
 terminate(_Reason, _SN, _SD) ->

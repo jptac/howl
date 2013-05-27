@@ -10,7 +10,11 @@
                   cowboy,
                   libsnarl,
                   mdns_server_lib,
-                  riak_core
+                  riak_core,
+                  crypto,
+                  newrelic,
+                  snmp,
+                  mnesia
                  ]},
   {mod, { howl_app, []}},
   {env, []}

@@ -27,6 +27,7 @@
                 preflist,
                 num_r=0,
                 size,
+                start,
                 timeout=?DEFAULT_TIMEOUT,
                 val,
                 vnode,
@@ -107,6 +108,7 @@ init([ReqId, {VNode, System}, Op, From, Entity, Val]) ->
                 from=From,
                 op=Op,
                 val=Val,
+                start = now(),
                 vnode=VNode,
                 system=System,
                 entity=Entity},
@@ -164,6 +166,9 @@ waiting({ok, ReqID, IdxNode, Obj},
                     Reply = howl_obj:val(Merged),
                     From ! {ReqID, ok, statebox:value(Reply)}
             end,
+            statman_histogram:record_value(
+              {<<"channel/read">>, total},
+              SD0#state.start),
             if
                 NumR =:= N ->
                     {next_state, finalize, SD, 0};
@@ -196,7 +201,11 @@ finalize(timeout, SD=#state{
     MObj = merge(Replies),
     case needs_repair(MObj, Replies) of
         true ->
+            Start = now(),
             repair(VNode, Entity, MObj, Replies),
+            statman_histogram:record_value(
+              {<<"channel/repair">>, total},
+              Start),
             {stop, normal, SD};
         false ->
             {stop, normal, SD}

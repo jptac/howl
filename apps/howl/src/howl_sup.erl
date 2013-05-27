@@ -31,12 +31,13 @@ init(_Args) ->
     CoverageFSMs = { howl_entity_coverage_fsm_sup,
                      { howl_entity_coverage_fsm_sup, start_link, []},
                      permanent, infinity, supervisor, [howl_entity_coverage_fsm_sup]},
-    ReadFSMs = {
-      howl_entity_read_fsm_sup,
-      {
-        howl_entity_read_fsm_sup, start_link, []},
-      permanent, infinity, supervisor, [howl_entity_read_fsm_sup]},
-
+    ReadFSMs = { howl_entity_read_fsm_sup,
+                 { howl_entity_read_fsm_sup, start_link, []},
+                 permanent, infinity, supervisor, [howl_entity_read_fsm_sup]},
     { ok,
       { {one_for_one, 5, 10},
-        [VMaster, WriteFSMs, ReadFSMs, CoverageFSMs]}}.
+        [{statman_server, {statman_server, start_link, [1000]},
+          permanent, 5000, worker, []},
+         {statman_aggregator, {statman_aggregator, start_link, []},
+          permanent, 5000, worker, []},
+         VMaster, WriteFSMs, ReadFSMs, CoverageFSMs]}}.
