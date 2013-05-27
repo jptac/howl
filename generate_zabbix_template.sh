@@ -24,7 +24,7 @@ cat <<EOF > howl_template.xml
             </applications>
             <items>
 EOF
-cat apps/howl/include/SNIFFLE-MIB.hrl | grep instance | sed 's/-define(//' | sed 's/_instance, ./ /' | sed 's/]).//' | sed 's/,/./g' | while read param oid
+cat apps/howl/include/HOWL-MIB.hrl | grep instance | sed 's/-define(//' | sed 's/_instance, ./ /' | sed 's/]).//' | sed 's/,/./g' | while read param oid
 do
     cat <<EOF >> howl_template.xml
                 <item>
