@@ -63,7 +63,7 @@ devrel: dev1 dev2 dev3 dev4
 devclean:
 	rm -rf dev
 
-dev1 dev2 dev3 dev4: all
+dev1 dev2 dev3 dev4: all zabbix
 	mkdir -p dev
 	(cd rel && $(REBAR) generate target_dir=../dev/$@ overlay_vars=vars/$@.config)
 
