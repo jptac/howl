@@ -17,7 +17,7 @@ init({_Andy, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
 websocket_init(_Any, Req, []) ->
-    {_, [C], Req0} = cowboy_req:parse_header(<<"sec-websocket-protocol">>, Req, <<"json">>),
+    {ok, C, Req0} = cowboy_req:parse_header(<<"sec-websocket-protocol">>, Req, <<"json">>),
     Req1 = cowboy_req:compact(Req0),
     {Encoder, Decoder, Type} = case C of
                                    <<"msgpack">> ->
