@@ -13,3 +13,9 @@
 ^riak_core
 ^supervisor_pre_r14b04.erl:1250:
 ^jsx_
+^eunit_test.erl:305:
+^lhttpc.erl:9:
+^meck_cover.erl:
+^lhttpc
+^msgpack_gen.erl:10:
+^newrelic.erl
