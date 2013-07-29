@@ -2,7 +2,6 @@
 
 case $2 in
     DEINSTALL)
-	echo "Stopping Howl service."
 	;;
     POST-DEINSTALL)
 	echo "Please beware that database and logfiles have not been"
