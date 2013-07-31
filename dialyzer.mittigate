@@ -19,3 +19,8 @@
 ^lhttpc
 ^msgpack_gen.erl:10:
 ^newrelic.erl
+^eunit_test.erl
+^lhttpc.erl:
+^meck_cover.erl:
+^glc_code.erl:
+^lager
