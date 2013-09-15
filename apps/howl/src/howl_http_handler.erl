@@ -125,7 +125,7 @@ handle_data([{<<"join">>, Channel}], Req,
 
 
 handle_data([{<<"leave">>, Channel}], Req,
-            State = #state{token = Token, type = Type, encoder = Enc}) ->
+            State = #state{type = Type, encoder = Enc}) ->
     howl:leave(Channel),
     {reply, {Type, Enc([{<<"ok">>, <<"channel left">>}])}, Req, State};
 
