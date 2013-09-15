@@ -1,5 +1,5 @@
 VERSION=0.1.9
-COMPONENT=howl
+COMPONENT=fifo-howl
 
 .PHONY: build_info package package_list
 
