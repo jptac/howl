@@ -31,19 +31,19 @@ case $2 in
 	    echo Service already existings ...
 	else
 	    echo Importing service ...
-	    svccfg import /opt/local/howl/share/howl.xml
+	    svccfg import /opt/local/fifo-howl/share/howl.xml
 	fi
 	echo Trying to guess configuration ...
 	IP=`ifconfig net0 | grep inet | awk -e '{print $2}'`
-	if [ ! -f /opt/local/howl/etc/vm.args ]
+	if [ ! -f /opt/local/fifo-howl/etc/vm.args ]
 	then
-	    cp /opt/local/howl/etc/vm.args.example /opt/local/howl/etc/vm.args
-	    sed --in-place -e "s/127.0.0.1/${IP}/g" /opt/local/howl/etc/vm.args
+	    cp /opt/local/fifo-howl/etc/vm.args.example /opt/local/fifo-howl/etc/vm.args
+	    sed --in-place -e "s/127.0.0.1/${IP}/g" /opt/local/fifo-howl/etc/vm.args
 	fi
-	if [ ! -f /opt/local/howl/etc/app.config ]
+	if [ ! -f /opt/local/fifo-howl/etc/app.config ]
 	then
-	    cp /opt/local/howl/etc/app.config.example /opt/local/howl/etc/app.config
-	    sed --in-place -e "s/127.0.0.1/${IP}/g" /opt/local/howl/etc/app.config
+	    cp /opt/local/fifo-howl/etc/app.config.example /opt/local/fifo-howl/etc/app.config
+	    sed --in-place -e "s/127.0.0.1/${IP}/g" /opt/local/fifo-howl/etc/app.config
 	fi
 
 	;;
