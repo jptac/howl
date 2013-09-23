@@ -22,7 +22,7 @@ Will join a channel for the websocket.
 
 
 ## TPC protocol
-The following TPC messages are known by the protocl. An example implementation can be found in [libhowl](https://github.com/project-fifo/libhowl).
+The following TPC messages are known by the protocol. An example implementation can be found in [libhowl](https://github.com/project-fifo/libhowl).
 
 ```
 {msg, Channel, Msg}
