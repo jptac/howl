@@ -1,4 +1,5 @@
 VERSION=0.1.9
+COMPONENT_INTERNAL=howl
 COMPONENT=fifo-howl
 
 .PHONY: build_info package package_list
@@ -15,4 +16,4 @@ clean:
 	-rm *.tgz build-info packlist
 
 package: package_list build_info
-	pkg_create -i install.sh -k deinstall.sh -D displayfile -B build-info -c comment -d description -f packlist -I /opt/local/$(COMPONENT) -p ../$(COMPONENT) -U $(COMPONENT)-$(VERSION)$(SUFFIX).tgz
+	pkg_create -i install.sh -k deinstall.sh -D displayfile -B build-info -c comment -d description -f packlist -I /opt/local/$(COMPONENT) -p ../$(COMPONENT_INTERNAL) -U $(COMPONENT)-$(VERSION)$(SUFFIX).tgz
