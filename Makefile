@@ -27,6 +27,7 @@ test: all xref
 	$(REBAR) skip_deps=true eunit
 
 rel: all zabbix
+	-rm -r rel/howl/share
 	$(REBAR) generate
 
 relclean:
