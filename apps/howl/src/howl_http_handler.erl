@@ -21,11 +21,12 @@ websocket_init(_Any, Req, []) ->
         cowboy_req:parse_header(
           <<"sec-websocket-protocol">>,
           Req, [<<"json">>]),
-    {Encoder, Decoder, Type, Req1} =
+    Req1 = cowboy_req:compact(Req0),
+    {Encoder, Decoder, Type, Req2} =
         case C of
             <<"msgpack">> ->
                 ReqX = cowboy_req:set_resp_header(
-                         <<"sec-websocket-protocol">>, C,  Req0),
+                         <<"sec-websocket-protocol">>, C,  Req1),
                 {fun(O) ->
                          msgpack:pack(O, [jsx])
                  end,
@@ -36,7 +37,7 @@ websocket_init(_Any, Req, []) ->
                  binary, ReqX};
             <<"json">> ->
                 ReqX = cowboy_req:set_resp_header(
-                         <<"sec-websocket-protocol">>, C,  Req0),
+                         <<"sec-websocket-protocol">>, C,  Req1),
                 {fun(O) ->
                          jsx:encode(O)
                  end,
@@ -52,19 +53,18 @@ websocket_init(_Any, Req, []) ->
                  end, text, Req0}
 
         end,
-    Req2 = cowboy_req:compact(Req1),
-    case cowboy_req:header(<<"x-snarl-token">>, Req1) of
-        {undefined, Req2} ->
-            case cowboy_req:cookie(<<"x-snarl-token">>, Req2) of
-                {undefined, Req3} ->
-                    {ok, Req3, #state{encoder = Encoder,
+    case cowboy_req:header(<<"x-snarl-token">>, Req2) of
+        {undefined, Req3} ->
+            case cowboy_req:cookie(<<"x-snarl-token">>, Req3) of
+                {undefined, Req4} ->
+                    {ok, Req4, #state{encoder = Encoder,
                                       decoder = Decoder, type = Type}};
-                {Token, Req3} ->
-                    {ok, Req3, #state{encoder = Encoder, decoder = Decoder,
+                {Token, Req4} ->
+                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
                                       type = Type, token = {token, Token}}}
             end;
-        {Token, Req2} ->
-            {ok, Req2, #state{encoder = Encoder, decoder = Decoder,
+        {Token, Req3} ->
+            {ok, Req3, #state{encoder = Encoder, decoder = Decoder,
                               type = Type, token = {token, Token}}}
     end.
 
