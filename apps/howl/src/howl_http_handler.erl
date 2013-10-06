@@ -21,10 +21,11 @@ websocket_init(_Any, Req, []) ->
         cowboy_req:parse_header(
           <<"sec-websocket-protocol">>,
           Req, [<<"json">>]),
-    Req1 = cowboy_req:compact(Req0),
-    {Encoder, Decoder, Type} =
+    {Encoder, Decoder, Type, Req1} =
         case C of
             <<"msgpack">> ->
+                ReqX = cowboy_req:set_resp_header(
+                         <<"sec-websocket-protocol">>, C,  Req0),
                 {fun(O) ->
                          msgpack:pack(O, [jsx])
                  end,
@@ -32,23 +33,26 @@ websocket_init(_Any, Req, []) ->
                          {ok, O} = msgpack:unpack(D, [jsx]),
                          jsxd:from_list(O)
                  end,
-                 binary};
+                 binary, ReqX};
             <<"json">> ->
+                ReqX = cowboy_req:set_resp_header(
+                         <<"sec-websocket-protocol">>, C,  Req0),
                 {fun(O) ->
                          jsx:encode(O)
                  end,
                  fun(D) ->
                          jsxd:from_list(jsx:decode(D))
-                 end, text};
+                 end, text, ReqX};
             <<>> ->
                 {fun(O) ->
                          jsx:encode(O)
                  end,
                  fun(D) ->
                          jsxd:from_list(jsx:decode(D))
-                 end, text}
+                 end, text, Req0}
 
         end,
+    Req2 = cowboy_req:compact(Req1),
     case cowboy_req:header(<<"x-snarl-token">>, Req1) of
         {undefined, Req2} ->
             case cowboy_req:cookie(<<"x-snarl-token">>, Req2) of
