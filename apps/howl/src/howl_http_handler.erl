@@ -17,7 +17,7 @@ init({_Andy, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
 websocket_init(_Any, Req, []) ->
-    {ok, [C], Req0} =
+    {ok, [C|_], Req0} =
         cowboy_req:parse_header(
           <<"sec-websocket-protocol">>,
           Req, [<<"json">>]),
