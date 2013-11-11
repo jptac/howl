@@ -24,3 +24,4 @@
 ^meck_cover.erl:
 ^glc_code.erl:
 ^lager
+^msgpack.erl:185: 
