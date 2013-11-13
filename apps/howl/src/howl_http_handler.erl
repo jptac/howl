@@ -17,14 +17,16 @@ init({_Andy, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
 websocket_init(_Any, Req, []) ->
-    {ok, [C], Req0} =
+    {ok, [C|_], Req0} =
         cowboy_req:parse_header(
           <<"sec-websocket-protocol">>,
           Req, [<<"json">>]),
     Req1 = cowboy_req:compact(Req0),
-    {Encoder, Decoder, Type} =
+    {Encoder, Decoder, Type, Req2} =
         case C of
             <<"msgpack">> ->
+                ReqX = cowboy_req:set_resp_header(
+                         <<"sec-websocket-protocol">>, C,  Req1),
                 {fun(O) ->
                          msgpack:pack(O, [jsx])
                  end,
@@ -32,35 +34,37 @@ websocket_init(_Any, Req, []) ->
                          {ok, O} = msgpack:unpack(D, [jsx]),
                          jsxd:from_list(O)
                  end,
-                 binary};
+                 binary, ReqX};
             <<"json">> ->
+                ReqX = cowboy_req:set_resp_header(
+                         <<"sec-websocket-protocol">>, C,  Req1),
                 {fun(O) ->
                          jsx:encode(O)
                  end,
                  fun(D) ->
                          jsxd:from_list(jsx:decode(D))
-                 end, text};
+                 end, text, ReqX};
             <<>> ->
                 {fun(O) ->
                          jsx:encode(O)
                  end,
                  fun(D) ->
                          jsxd:from_list(jsx:decode(D))
-                 end, text}
+                 end, text, Req0}
 
         end,
-    case cowboy_req:header(<<"x-snarl-token">>, Req1) of
-        {undefined, Req2} ->
-            case cowboy_req:cookie(<<"x-snarl-token">>, Req2) of
-                {undefined, Req3} ->
-                    {ok, Req3, #state{encoder = Encoder,
+    case cowboy_req:header(<<"x-snarl-token">>, Req2) of
+        {undefined, Req3} ->
+            case cowboy_req:cookie(<<"x-snarl-token">>, Req3) of
+                {undefined, Req4} ->
+                    {ok, Req4, #state{encoder = Encoder,
                                       decoder = Decoder, type = Type}};
-                {Token, Req3} ->
-                    {ok, Req3, #state{encoder = Encoder, decoder = Decoder,
+                {Token, Req4} ->
+                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
                                       type = Type, token = {token, Token}}}
             end;
-        {Token, Req2} ->
-            {ok, Req2, #state{encoder = Encoder, decoder = Decoder,
+        {Token, Req3} ->
+            {ok, Req3, #state{encoder = Encoder, decoder = Decoder,
                               type = Type, token = {token, Token}}}
     end.
 
@@ -112,7 +116,7 @@ handle_data(_, Req, State = #state{type = Type,
     {reply, {Type, Enc([{<<"error">>, <<"not authenticated">>}])}, Req, State};
 
 handle_data([{<<"join">>, Channel}], Req,
-            State = #state{token = Token,type = Type, encoder = Enc}) ->
+            State = #state{token = Token, type = Type, encoder = Enc}) ->
     case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
         true ->
             howl:listen(Channel),
@@ -125,14 +129,9 @@ handle_data([{<<"join">>, Channel}], Req,
 
 
 handle_data([{<<"leave">>, Channel}], Req,
-            State = #state{token = Token, type = Type, encoder = Enc}) ->
-    case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
-        true ->
-            howl:leave(Channel),
-            {reply, {Type, Enc([{<<"ok">>, <<"channel left">>}])}, Req, State};
-        _ ->
-            {reply, {Type, Enc([{<<"error">>, <<"permission denied">>}])}, Req, State}
-    end;
+            State = #state{type = Type, encoder = Enc}) ->
+    howl:leave(Channel),
+    {reply, {Type, Enc([{<<"ok">>, <<"channel left">>}])}, Req, State};
 
 
 handle_data(_JSON, Req, State) ->

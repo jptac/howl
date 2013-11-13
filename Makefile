@@ -2,7 +2,16 @@ REBAR = $(shell pwd)/rebar
 
 .PHONY: deps rel stagedevrel package version all
 
-all: deps compile
+all: cp-hooks deps compile
+
+cp-hooks:
+	cp hooks/* .git/hooks
+
+quick-xref:
+	$(REBAR) xref skip_deps=true
+
+quick-test:
+	$(REBAR) skip_deps=true eunit
 
 version:
 	echo "$(shell git symbolic-ref HEAD 2> /dev/null | cut -b 12-)-$(shell git log --pretty=format:'%h, %ad' -1)" > howl.version
@@ -27,6 +36,7 @@ test: all xref
 	$(REBAR) skip_deps=true eunit
 
 rel: all zabbix
+	-rm -r rel/howl/share
 	$(REBAR) generate
 
 relclean:

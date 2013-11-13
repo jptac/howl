@@ -1,4 +1,4 @@
-cat <<EOF > howl_template.xml
+cat <<EOF > share/howl_template.xml
 <?xml version="1.0" encoding="UTF-8"?>
 <zabbix_export>
     <version>2.0</version>
