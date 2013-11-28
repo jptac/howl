@@ -33,25 +33,13 @@ case $2 in
 	chown -R howl:howl /var/log/howl
 	;;
     POST-INSTALL)
-	if svcs svc:/network/howl:default > /dev/null 2>&1
-	then
-	    echo Service already existings ...
-	else
-	    echo Importing service ...
-	    svccfg import /opt/local/fifo-howl/share/howl.xml
-	fi
+	svccfg import /opt/local/fifo-howl/share/howl.xml
 	echo Trying to guess configuration ...
 	IP=`ifconfig net0 | grep inet | awk -e '{print $2}'`
-	if [ ! -f /opt/local/fifo-howl/etc/vm.args ]
+	if [ ! -f /opt/local/fifo-howl/etc/howl.conf ]
 	then
-	    cp /opt/local/fifo-howl/etc/vm.args.example /opt/local/fifo-howl/etc/vm.args
-	    sed --in-place -e "s/127.0.0.1/${IP}/g" /opt/local/fifo-howl/etc/vm.args
+	    cp /opt/local/fifo-howl/etc/howl.conf.example /opt/local/fifo-howl/etc/howl.conf
+	    sed --in-place -e "s/127.0.0.1/${IP}/g" /opt/local/fifo-howl/etc/howl.conf
 	fi
-	if [ ! -f /opt/local/fifo-howl/etc/app.config ]
-	then
-	    cp /opt/local/fifo-howl/etc/app.config.example /opt/local/fifo-howl/etc/app.config
-	    sed --in-place -e "s/127.0.0.1/${IP}/g" /opt/local/fifo-howl/etc/app.config
-	fi
-
 	;;
 esac

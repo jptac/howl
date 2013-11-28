@@ -47,7 +47,7 @@
       exec='/opt/local/fifo-howl/bin/howl %m'
       timeout_seconds='30'>
       <method_context>
-	<method_credential user='howl' group='howl' />
+	<!--method_credential user='howl' group='howl' /-->
 	<method_environment>
 	  <envvar name='PATH' value='/opt/local/gnu/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin'/>
 	  <envvar name='HOME' value='/var/db/howl'/>
@@ -61,7 +61,7 @@
         exec='/opt/local/fifo-howl/bin/howl %m'
 	timeout_seconds='60'>
       <method_context>
-	<method_credential user='howl' group='howl' />
+	<!--method_credential user='howl' group='howl' /-->
 	<method_environment>
 	  <envvar name='PATH' value='/opt/local/gnu/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin'/>
 	  <envvar name='HOME' value='/var/db/howl'/>
@@ -75,7 +75,7 @@
         exec='/opt/local/fifo-howl/bin/howl %m'
 	timeout_seconds='60'>
       <method_context>
-	<method_credential user='howl' group='howl' />
+	<!--method_credential user='howl' group='howl' /-->
 	<method_environment>
 	  <envvar name='PATH' value='/opt/local/gnu/bin:/opt/local/bin:/opt/local/sbin:/usr/bin:/usr/sbin'/>
 	  <envvar name='HOME' value='/var/db/howl'/>
