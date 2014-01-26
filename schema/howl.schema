@@ -92,9 +92,12 @@
 
 %% @doc Default ring creation size.  Make sure it is a power of 2,
 %% e.g. 16, 32, 64, 128, 256, 512 etc
+%% This is set to a default of 4 to work in a one server installation
+%% if you plan to expand your system please set it higher and reads
+%% the manual at http://bit.ly/1ciKRkS
 {mapping, "ring_size", "riak_core.ring_creation_size",
  [{datatype, integer},
-  {default, 64},
+  {default, 8},
   {commented, 64},
   {validators, ["ring_size"]}
  ]}.
