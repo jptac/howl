@@ -11,7 +11,7 @@
               websocket_info/3, websocket_terminate/3]).
 -ignore_xref([init/3, handle/2, terminate/2]).
 
--record(state, {token, encoder, decoder, type}).
+-record(state, {token, encoder, decoder, type, channels=[]}).
 
 init({_Andy, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
@@ -81,7 +81,8 @@ websocket_info({msg, Msg}, Req, State = #state{type = Type, encoder = Enc}) ->
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
-websocket_terminate(normal, _Req, _State) ->
+websocket_terminate(normal, _Req, #state{channels = Cs}) ->
+    [howl:leave(C) || C <- Cs],
     ok;
 
 websocket_terminate(Reason, _Req, State) ->
@@ -116,12 +117,13 @@ handle_data(_, Req, State = #state{type = Type,
     {reply, {Type, Enc([{<<"error">>, <<"not authenticated">>}])}, Req, State};
 
 handle_data([{<<"join">>, Channel}], Req,
-            State = #state{token = Token, type = Type, encoder = Enc}) ->
+            State = #state{token = Token, type = Type, encoder = Enc,
+                           channels=Cs}) ->
     case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
         true ->
             howl:listen(Channel),
             {reply, {Type, Enc([{<<"ok">>, <<"channel joined">>}])},
-             Req, State};
+             Req, State#state{channels=[Channel | Cs]}};
         _ ->
             {reply, {Type, Enc([{<<"error">>, <<"permission denied">>}])},
              Req, State}
@@ -129,10 +131,10 @@ handle_data([{<<"join">>, Channel}], Req,
 
 
 handle_data([{<<"leave">>, Channel}], Req,
-            State = #state{type = Type, encoder = Enc}) ->
+            State = #state{type = Type, encoder = Enc, channels=Cs}) ->
     howl:leave(Channel),
-    {reply, {Type, Enc([{<<"ok">>, <<"channel left">>}])}, Req, State};
-
+    {reply, {Type, Enc([{<<"ok">>, <<"channel left">>}])}, Req,
+     State#state{channels=[C || C <- Cs, C =/= Channel]}};
 
 handle_data(_JSON, Req, State) ->
     {ok, Req, State}.

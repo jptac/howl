@@ -164,7 +164,7 @@ waiting({ok, ReqID, IdxNode, Obj},
                     From ! {ReqID, ok, not_found};
                 Merged ->
                     Reply = howl_obj:val(Merged),
-                    From ! {ReqID, ok, statebox:value(Reply)}
+                    From ! {ReqID, ok, Reply}
             end,
             statman_histogram:record_value(
               {<<"channel/read">>, total},
@@ -240,11 +240,18 @@ merge(Replies) ->
 %% @pure
 %%
 %% @doc Reconcile conflicts among conflicting values.
--spec reconcile([A :: statebox:statebox()]) -> A :: statebox:statebox().
+-spec reconcile([A :: ordsets:ordset()]) -> A :: ordsets:ordset().
 
 reconcile(Vals) ->
-    statebox:merge(Vals).
+    [Pids | R] = [purge(Pids) || Pids <- Vals],
+    lists:foldl(fun (PidsIn, Acc) ->
+                        ordsets:union(PidsIn, Acc)
+                end, Pids, R).
 
+purge(Pids) ->
+    lists:filter(fun (P) ->
+                         process_info(P) =/= undefined
+                 end, Pids).
 
 %% @pure
 %%
