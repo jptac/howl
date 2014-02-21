@@ -79,7 +79,7 @@ handle_command(ping, _Sender, State) ->
 
 handle_command({repair, Channel, _VClock, #howl_obj{val=Val0} = Obj}, _Sender,
                #state{channels=Channels0}=State) ->
-    Listeners = [{L, Channel} || L <- statebox:value(Val0)],
+    Listeners = [{L, Channel} || L <- Val0],
     Channels1 = lists:keystore(Channel, 1, Channels0, {Channel, Obj}),
     {noreply, State#state{channels = Channels1,
                           listeners = Listeners ++ State#state.listeners}};
@@ -98,19 +98,16 @@ handle_command({listen, {ReqID, Coordinator}, Channel, Listener}, _Sender,
                       listeners = Listeners0} = State) ->
     case lists:keyfind(Channel, 1, Channels0) of
         false ->
-            Val0 = statebox:new(fun howl_entity_state:new/0),
-            Val1 = statebox:modify({fun howl_entity_state:add/2, [Listener]}, Val0),
             VC0 = vclock:fresh(),
             VC = vclock:increment(Coordinator, VC0),
-            Obj = #howl_obj{val=Val1, vclock=VC},
+            Obj = #howl_obj{val=[Listener], vclock=VC},
             Channels1 = [{Channel, Obj}|Channels0],
             riak_core_vnode:monitor({raw, erlang:make_ref(), Listener}),
             {reply, {ok, ReqID}, State#state{channels=Channels1,
                                              listeners=[{Listener, Channel}|Listeners0]}};
         {Channel, #howl_obj{val=Val0} = O} ->
-            Val1 = statebox:modify({fun howl_entity_state:add/2, [Listener]}, Val0),
-            Val2 = statebox:expire(?STATEBOX_EXPIRE, Val1),
-            Obj = howl_obj:update(Val2, Coordinator, O),
+            Val1 = ordsets:add_element(Listener, Val0),
+            Obj = howl_obj:update(Val1, Coordinator, O),
             Channels1 = lists:keystore(Channel, 1, Channels0, {Channel, Obj}),
             riak_core_vnode:monitor({raw, erlang:make_ref(), Listener}),
             {reply, {ok, ReqID}, State#state{channels=Channels1,
@@ -123,13 +120,11 @@ handle_command({leave, {ReqID, Coordinator}, Channel, Listener}, _Sender,
     Listeners1 = lists:delete({Listener, Channel}, Listeners0),
     Channels1 = case lists:keyfind(Channel, 1, Channels0) of
                     {Channel, #howl_obj{val=Val0} = O} ->
-                        Val1 = statebox:modify({fun howl_entity_state:remove/2, [Listener]}, Val0),
-                        Val2 = statebox:expire(?STATEBOX_EXPIRE, Val1),
-                        case statebox:value(Val2) of
+                        case ordsets:del_element(Listener, Val0) of
                             [] ->
                                 lists:keydelete(Channel, 1, Channels0);
-                            _ ->
-                                Obj = howl_obj:update(Val2, Coordinator, O),
+                            Val1 ->
+                                Obj = howl_obj:update(Val1, Coordinator, O),
                                 lists:keystore(Channel, 1, Channels0, {Channel, Obj})
                         end;
                     _ ->
@@ -163,7 +158,7 @@ handoff_finished(_TargetNode, State) ->
 
 handle_handoff_data(Data, State) ->
     {Channel, #howl_obj{val=Val0} = O} = binary_to_term(Data),
-    Listeners = [{L, Channel} || L <- statebox:value(Val0)],
+    Listeners = [{L, Channel} || L <- Val0],
     Channels = lists:keystore(Channel, 1, State#state.channels, {Channel, O}),
     {reply, ok, State#state{channels = Channels,
                             listeners = Listeners ++ State#state.listeners}}.
@@ -204,13 +199,11 @@ delete_listener(Listener, State = #state{channels=Channels0, listeners=Listeners
     Channels2 = lists:foldl(fun ({_, Channel}, Channels1) ->
                                     case lists:keyfind(Channel, 1, Channels1) of
                                         {Channel, #howl_obj{val=Val0} = O} ->
-                                            Val1 = statebox:modify({fun howl_entity_state:remove/2, [Listener]}, Val0),
-                                            Val2 = statebox:expire(?STATEBOX_EXPIRE, Val1),
-                                            case statebox:value(Val2) of
+                                            case ordsets:del_element(Listener, Val0) of
                                                 [] ->
                                                     lists:keydelete(Channel, 1, Channels1);
-                                                _ ->
-                                                    Obj = howl_obj:update(Val2, Listener, O),
+                                                Val1 ->
+                                                    Obj = howl_obj:update(Val1, Listener, O),
                                                     lists:keystore(Channel, 1, Channels1, {Channel, Obj})
                                             end;
                                         _ ->
