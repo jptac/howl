@@ -247,9 +247,10 @@ reconcile(Vals) ->
     lists:foldl(fun (PidsIn, Acc) ->
                         ordsets:union(PidsIn, Acc)
                 end, Pids, R).
-
 purge(Pids) ->
-    [P || P <- Pids, is_pid(P), is_process_alive(P)].
+    lists:filter(fun (P) ->
+                         is_pid(P) andalso erlang:is_process_alive(P)
+                 end, Pids).
 
 %% @pure
 %%
