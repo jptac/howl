@@ -249,9 +249,7 @@ reconcile(Vals) ->
                 end, Pids, R).
 
 purge(Pids) ->
-    lists:filter(fun (P) ->
-                         process_info(P) =/= undefined
-                 end, Pids).
+    [P || P <- Pids, is_pid(P), is_process_alive(P)].
 
 %% @pure
 %%
