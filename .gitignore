@@ -8,7 +8,7 @@ Mnesia.*
 apps/howl/ebin
 apps/howl/include/HOWL-MIB.hrl
 apps/howl/priv/mibs/HOWL-MIB.bin
-apps/howl/src/howl_version.hrl
+apps/howl/include/howl_version.hrl
 db
 deps
 dev
