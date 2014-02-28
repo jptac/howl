@@ -59,13 +59,14 @@ websocket_init(_Any, Req, []) ->
                               type = Type, token = {token, Token}}};
         {_, Req3} ->
             case cowboy_req:cookie(<<"x-snarl-token">>, Req3) of
-                {undefined, Req4} ->
-                    {ok, Req5} =
-                        cowboy_req:reply(401, Req4),
-                    {shutdown, Req5};
                 {<<Token:36/binary>>, Req4} ->
                     {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
-                                      type = Type, token = {token, Token}}}
+                                      type = Type, token = {token, Token}}};
+                {Bad, Req4} ->
+                    lager:warning("[ws] Bad token: ~p", [Bad]),
+                    {ok, Req5} =
+                        cowboy_req:reply(401, Req4),
+                    {shutdown, Req5}
             end
     end.
 
