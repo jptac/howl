@@ -31,8 +31,12 @@ websocket_init(_Any, Req, []) ->
                          msgpack:pack(O, [jsx])
                  end,
                  fun(D) ->
-                         {ok, O} = msgpack:unpack(D, [jsx]),
-                         jsxd:from_list(O)
+                         case msgpack:unpack(D, [jsx]) of
+                             {ok, O} ->
+                                 jsxd:from_list(O);
+                             _ ->
+                                 []
+                         end
                  end,
                  binary, ReqX};
             <<"json">> ->
