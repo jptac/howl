@@ -62,11 +62,9 @@ websocket_init(_Any, Req, []) ->
                 {<<Token:36/binary>>, Req4} ->
                     {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
                                       type = Type, token = {token, Token}}};
-                {Bad, Req4} ->
-                    lager:warning("[ws] Bad token: ~p", [Bad]),
-                    {ok, Req5} =
-                        cowboy_req:reply(401, Req4),
-                    {shutdown, Req5}
+                {_, Req4} ->
+                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
+                                      type = Type}}
             end
     end.
 
@@ -96,10 +94,15 @@ handle_data([{<<"ping">>, V}], Req,
             State = #state{type = Type, encoder = Enc}) ->
     {reply, {Type, Enc([{<<"pong">>, V}])}, Req, State};
 
-handle_data([{<<"token">>, Token}], Req,
+handle_data([{<<"token">>, <<Token:36/binary>>}], Req,
             State = #state{type = Type, encoder = Enc}) ->
     {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req,
      State#state{token = {token, Token}}};
+
+handle_data([{<<"token">>, _}], Req,
+            State = #state{type = Type, encoder = Enc}) ->
+    {reply, {Type, Enc([{<<"error">>, <<"invalid token">>}])}, Req,
+     State};
 
 handle_data([{<<"auth">>, Auth}], Req,
             State = #state{type = Type, encoder = Enc}) ->
