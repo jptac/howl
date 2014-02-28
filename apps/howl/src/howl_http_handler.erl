@@ -61,7 +61,7 @@ websocket_init(_Any, Req, []) ->
             case cowboy_req:cookie(<<"x-snarl-token">>, Req3) of
                 {undefined, Req4} ->
                     {ok, Req5} =
-                        cowboy_req:reply(401, <<"x-snarl-token">>, Req4),
+                        cowboy_req:reply(401, Req4),
                     {shutdown, Req5};
                 {<<Token:36/binary>>, Req4} ->
                     {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
