@@ -249,7 +249,7 @@ reconcile(Vals) ->
                 end, Pids, R).
 purge(Pids) ->
     lists:filter(fun (P) ->
-                         is_pid(P) andalso erlang:is_process_alive(P)
+                         is_process_alive(node(P), P)
                  end, Pids).
 
 %% @pure
@@ -293,3 +293,15 @@ unique(L) ->
 
 mk_reqid() ->
     erlang:phash2(erlang:now()).
+
+%% @doc Remote call to determine if process is alive or not; assume if
+%%      the node fails communication it is, since we have no proof it
+%%      is not.
+%% From: https://github.com/cmeiklejohn/riak_pg/blob/master/src/riak_pg_members_fsm.erl
+is_process_alive(Node, Pid) ->
+    case rpc:call(Node, erlang, is_process_alive, [Pid]) of
+        {badrpc, _} ->
+            true;
+        Value ->
+            Value
+    end.
