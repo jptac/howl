@@ -19,6 +19,7 @@
          handle_handoff_data/2,
          encode_handoff_item/2,
          handle_coverage/4,
+         handle_info/2,
          handle_exit/3]).
 
 -export([leave/4, listen/4, listeners/3]).
@@ -29,6 +30,7 @@
               listen/4,
               leave/4,
               repair/4,
+              handle_info/2,
               listeners/3
              ]).
 
@@ -44,6 +46,8 @@ start_vnode(I) ->
     riak_core_vnode_master:get_vnode_pid(I, ?MODULE).
 
 init([Partition]) ->
+    %% We want to cleanup listeners every 10s
+    timer:send_interval(10000, cleanup),
     {ok, #state { partition=Partition,
                   node = node(),
                   channels = [],
@@ -181,8 +185,29 @@ delete(State) ->
 handle_coverage(_Req, _KeySpaces, _Sender, State) ->
     {stop, not_implemented, State}.
 
+handle_info(cleanup, State = #state{listeners=Listeners})  ->
+    {N, State1} = lists:foldl(
+                    fun({P, _}, {N, Acc}) ->
+                            case is_process_alive(node(P), P) of
+                                true ->
+                                    {N, Acc};
+                                false ->
+                                    {N + 1, delete_listener(P, Acc)}
+                            end
+                    end, {0, State}, Listeners),
+    case N of
+        0 ->
+            ok;
+        _ ->
+            lager:warning("Cleanup delented ~p old listeners.", [N])
+    end,
+    {ok, State1};
+
+handle_info(_Msg, State)  ->
+    {ok, State}.
+
 handle_exit(Listener, _Reason, State) ->
-    {noreply,delete_listener(Listener, State)}.
+    {noreply, delete_listener(Listener, State)}.
 
 terminate(_Reason, _State) ->
     ok.
@@ -212,3 +237,11 @@ delete_listener(Listener, State = #state{channels=Channels0, listeners=Listeners
                             end, Channels0, ToDelete),
     State#state{listeners = Listeners1,
                 channels = Channels2}.
+
+is_process_alive(Node, Pid) ->
+    case rpc:call(Node, erlang, is_process_alive, [Pid]) of
+        {badrpc, _} ->
+            false;
+        Value ->
+            Value
+    end.
