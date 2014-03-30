@@ -17,7 +17,7 @@ version:
 	echo "$(shell git symbolic-ref HEAD 2> /dev/null | cut -b 12-)-$(shell git log --pretty=format:'%h, %ad' -1)" > howl.version
 
 version_header: version
-	echo "-define(VERSION, <<\"$(shell cat howl.version)\">>)." > apps/howl/src/howl_version.hrl
+	echo "-define(VERSION, <<\"$(shell cat howl.version)\">>)." > apps/howl/include/howl_version.hrl
 
 compile: version_header
 	$(REBAR) compile
@@ -75,7 +75,7 @@ devclean:
 
 dev1 dev2 dev3 dev4: all zabbix
 	mkdir -p dev
-	(cd rel && $(REBAR) generate target_dir=../dev/$@ overlay_vars=vars/$@.config)
+	($(REBAR) generate target_dir=../dev/$@ overlay_vars=vars/$@.config)
 
 xref: all
 	$(REBAR) xref skip_deps=true

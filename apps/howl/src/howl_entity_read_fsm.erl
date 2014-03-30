@@ -95,7 +95,6 @@ init([ReqId, {VNode, System}, Op, From, Entity]) ->
     init([ReqId, {VNode, System}, Op, From, Entity, undefined]);
 
 init([ReqId, {VNode, System}, Op, From, Entity, Val]) ->
-    ?PRINT({init, [Op, ReqId, From, Entity, Val]}),
     {N, R, _W} = case application:get_key(System) of
                      {ok, Res} ->
                          Res;
@@ -132,7 +131,6 @@ execute(timeout, SD0=#state{req_id=ReqId,
                             val=Val,
                             vnode=VNode,
                             preflist=Prelist}) ->
-    ?PRINT({execute, Entity, Val}),
     case Entity of
         undefined ->
             VNode:Op(Prelist, ReqId);
@@ -164,7 +162,7 @@ waiting({ok, ReqID, IdxNode, Obj},
                     From ! {ReqID, ok, not_found};
                 Merged ->
                     Reply = howl_obj:val(Merged),
-                    From ! {ReqID, ok, statebox:value(Reply)}
+                    From ! {ReqID, ok, Reply}
             end,
             statman_histogram:record_value(
               {<<"channel/read">>, total},
@@ -240,11 +238,17 @@ merge(Replies) ->
 %% @pure
 %%
 %% @doc Reconcile conflicts among conflicting values.
--spec reconcile([A :: statebox:statebox()]) -> A :: statebox:statebox().
+-spec reconcile([A :: ordsets:ordset()]) -> A :: ordsets:ordset().
 
 reconcile(Vals) ->
-    statebox:merge(Vals).
-
+    [Pids | R] = [purge(Pids) || Pids <- Vals],
+    lists:foldl(fun (PidsIn, Acc) ->
+                        ordsets:union(PidsIn, Acc)
+                end, Pids, R).
+purge(Pids) ->
+    lists:filter(fun (P) ->
+                         is_process_alive(node(P), P)
+                 end, Pids).
 
 %% @pure
 %%
@@ -287,3 +291,15 @@ unique(L) ->
 
 mk_reqid() ->
     erlang:phash2(erlang:now()).
+
+%% @doc Remote call to determine if process is alive or not; assume if
+%%      the node fails communication it is, since we have no proof it
+%%      is not.
+%% From: https://github.com/cmeiklejohn/riak_pg/blob/master/src/riak_pg_members_fsm.erl
+is_process_alive(Node, Pid) ->
+    case rpc:call(Node, erlang, is_process_alive, [Pid]) of
+        {badrpc, _} ->
+            true;
+        Value ->
+            Value
+    end.
