@@ -12,7 +12,6 @@
                   mdns_server_lib,
                   riak_core,
                   crypto,
-                  newrelic,
                   snmp,
                   mnesia
                  ]},
