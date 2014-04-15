@@ -12,7 +12,7 @@
 
 %% @doc The TCP endpoint that will be broadcasted.
 {mapping, "ip", "mdns_server_lib.listener",
- [{default, {"{{snarl_ip}}", {{snarl_port}} }},
+ [{default, {"{{howl_ip}}", {{howl_port}} }},
   {datatype, ip}]}.
 
 {translation,
