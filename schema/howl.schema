@@ -11,28 +11,12 @@
   {datatype, integer}]}.
 
 %% @doc The TCP endpoint that will be broadcasted.
-{mapping, "ip", "howl.endpoint",
+{mapping, "ip", "sniffle.endpoint",
  [{default, {"{{howl_ip}}", {{tcp_port}} }},
   {datatype, ip}]}.
 
 {translation,
  "howl.tcp_port",
- fun(Conf) ->
-         {_IP, Port} = cuttlefish:conf_get("ip", Conf),
-         Port
- end
-}.
-
-{translation,
- "mdns_server_lib.ip",
- fun(Conf) ->
-         {IP, _Port} = cuttlefish:conf_get("ip", Conf),
-         IP
- end
-}.
-
-{translation,
- "mdns_server_lib.port",
  fun(Conf) ->
          {_IP, Port} = cuttlefish:conf_get("ip", Conf),
          Port
