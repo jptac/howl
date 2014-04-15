@@ -11,17 +11,9 @@
   {datatype, integer}]}.
 
 %% @doc The TCP endpoint that will be broadcasted.
-{mapping, "ip", "sniffle.endpoint",
- [{default, {"{{howl_ip}}", {{tcp_port}} }},
+{mapping, "ip", "mdns_server_lib.listener",
+ [{default, {"{{snarl_ip}}", {{snarl_port}} }},
   {datatype, ip}]}.
-
-{translation,
- "howl.tcp_port",
- fun(Conf) ->
-         {_IP, Port} = cuttlefish:conf_get("ip", Conf),
-         Port
- end
-}.
 
 {translation,
  "mdns_client_lib.interface",
@@ -30,6 +22,24 @@
          [A, B, C, D] = [list_to_integer(O) ||
                             O <- re:split(IP, "\\.", [{return, list}])],
          {A, B, C, D}
+ end
+}.
+
+{translation,
+ "mdns_server_lib.interface",
+ fun(Conf) ->
+         {IP, _Port} = cuttlefish:conf_get("ip", Conf),
+         [A, B, C, D] = [list_to_integer(O) ||
+                            O <- re:split(IP, "\\.", [{return, list}])],
+         {A, B, C, D}
+ end
+}.
+
+{translation,
+ "howl.tcp_port",
+ fun(Conf) ->
+         {_IP, Port} = cuttlefish:conf_get("ip", Conf),
+         Port
  end
 }.
 
