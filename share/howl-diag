@@ -1,0 +1,60 @@
+#!/usr/bin/bash
+
+admin=/opt/local/fifo-howl/bin/howl-admin
+
+date=$(date +%F-%H-%M-%S)
+base=/var/tmp/howl-diag
+dir=$base/$date
+mkdir -p $dir
+log_file=$dir/howl-diag.log
+echo '========================================' > $log_file
+echo "Howl Diagnostics ${date}" >> $log_file
+echo '========================================' >> $log_file
+function log_run(){
+  echo >> $log_file
+  echo >> $log_file
+  echo '----------------------------------------' >> $log_file
+  echo $* >> $log_file
+  echo '----------------------------------------' >> $log_file
+  $* >> $log_file
+}
+echo "Gathering System information."
+log_run ifconfig
+echo >> $log_file >> $log_file
+echo >> $log_file
+echo '----------------------------------------' >> $log_file
+echo 'pkgin list | grep fifo-howl' >> $log_file
+echo '----------------------------------------' >> $log_file
+pkgin list | grep fifo-howl >> $log_file
+log_run svcs svc:/network/howl:default
+log_run df -h
+log_run zonememstat
+log_run prstat 1 1
+log_run sysinfo
+
+echo "Gathering Cluster information."
+log_run $admin status
+log_run $admin ringready
+log_run $admin services
+log_run $admin ring_status
+log_run $admin member_status
+
+pid=$(pgrep -f /opt/local/fifo-howl/*/bin/beam.smp)
+log_run lsof -P $pid
+log_run lsof -F $pid
+
+echo "Copying Logfiles"
+cp -r /var/log/howl $dir/logs
+cp /var/svc/log/network-howl:default.log $dir/logs
+
+echo "Copying config files"
+mkdir $dir/config
+cp /opt/local/fifo-howl/etc/howl.conf* $dir/config
+cp -r /var/db/howl/generated.configs/ $dir/config
+
+echo "Compressing data"
+(cd $base; tar cfz howl-diag-$date.tgz $date)
+
+echo
+echo
+echo Diagnostics run complete the the file can be found in $base/howl-diag-$date.tgz the data provided can be inspected in $base/$date.
