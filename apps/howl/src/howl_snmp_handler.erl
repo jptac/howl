@@ -110,19 +110,19 @@ percentile_get(What, Prefix, Grouping) ->
     end.
 
 generate_percentile(_Prefix, _Grouping) ->
-    [{observations,12},
-     {min,15986},
-     {median,17581},
-     {mean,17796.416666666668},
-     {max,19912},
-     {sd,1135.098911055232},
-     {sum,213557},
-     {sum2,3814722299},
-     {p25,16831},
-     {p75,17995},
-     {p95,19912},
-     {p99,19912},
-     {p999,19912}].
+    [{observations, 12},
+     {min, 15986},
+     {median, 17581},
+     {mean, 17796.416666666668},
+     {max, 19912},
+     {sd, 1135.098911055232},
+     {sum, 213557},
+     {sum2, 3814722299},
+     {p25, 16831},
+     {p75, 17995},
+     {p95, 19912},
+     {p99, 19912},
+     {p999, 19912}].
 
 %% L = byte_size(Prefix),
 %% {ok, Data} = statman_aggregator:get_window(60),
