@@ -36,8 +36,4 @@ init(_Args) ->
                  permanent, infinity, supervisor, [howl_entity_read_fsm_sup]},
     { ok,
       { {one_for_one, 5, 10},
-        [{statman_server, {statman_server, start_link, [1000]},
-          permanent, 5000, worker, []},
-         {statman_aggregator, {statman_aggregator, start_link, []},
-          permanent, 5000, worker, []},
-         VMaster, WriteFSMs, ReadFSMs, CoverageFSMs]}}.
+        [VMaster, WriteFSMs, ReadFSMs, CoverageFSMs]}}.

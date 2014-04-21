@@ -24,7 +24,6 @@ start(_StartType, _StartArgs) ->
             ok = riak_core_ring_events:add_guarded_handler(howl_ring_event_handler, []),
             ok = riak_core_node_watcher_events:add_guarded_handler(howl_node_event_handler, []),
             ok = riak_core_node_watcher:service_up(howl, self()),
-            statman_server:add_subscriber(statman_aggregator),
             howl_snmp_handler:start(),
             {ok, Pid};
         {error, Reason} ->
