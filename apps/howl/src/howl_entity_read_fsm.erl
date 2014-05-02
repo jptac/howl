@@ -164,9 +164,6 @@ waiting({ok, ReqID, IdxNode, Obj},
                     Reply = howl_obj:val(Merged),
                     From ! {ReqID, ok, Reply}
             end,
-            statman_histogram:record_value(
-              {<<"channel/read">>, total},
-              SD0#state.start),
             if
                 NumR =:= N ->
                     {next_state, finalize, SD, 0};
@@ -199,11 +196,7 @@ finalize(timeout, SD=#state{
     MObj = merge(Replies),
     case needs_repair(MObj, Replies) of
         true ->
-            Start = now(),
             repair(VNode, Entity, MObj, Replies),
-            statman_histogram:record_value(
-              {<<"channel/repair">>, total},
-              Start),
             {stop, normal, SD};
         false ->
             {stop, normal, SD}

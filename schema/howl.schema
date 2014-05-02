@@ -11,41 +11,35 @@
   {datatype, integer}]}.
 
 %% @doc The TCP endpoint that will be broadcasted.
-{mapping, "ip", "howl.endpoint",
+{mapping, "ip", "mdns_server_lib.listener",
  [{default, {"{{howl_ip}}", {{tcp_port}} }},
   {datatype, ip}]}.
 
 {translation,
- "howl.tcp_port",
- fun(Conf) ->
-         {_IP, Port} = cuttlefish_util:conf_get_value("ip", Conf),
-         Port
- end
-}.
-
-{translation,
- "mdns_server_lib.ip",
- fun(Conf) ->
-         {IP, _Port} = cuttlefish_util:conf_get_value("ip", Conf),
-         IP
- end
-}.
-
-{translation,
- "mdns_server_lib.port",
- fun(Conf) ->
-         {_IP, Port} = cuttlefish_util:conf_get_value("ip", Conf),
-         Port
- end
-}.
-
-{translation,
  "mdns_client_lib.interface",
  fun(Conf) ->
-         {IP, _Port} = cuttlefish_util:conf_get_value("ip", Conf),
+         {IP, _Port} = cuttlefish:conf_get("ip", Conf),
          [A, B, C, D] = [list_to_integer(O) ||
                             O <- re:split(IP, "\\.", [{return, list}])],
          {A, B, C, D}
+ end
+}.
+
+{translation,
+ "mdns_server_lib.interface",
+ fun(Conf) ->
+         {IP, _Port} = cuttlefish:conf_get("ip", Conf),
+         [A, B, C, D] = [list_to_integer(O) ||
+                            O <- re:split(IP, "\\.", [{return, list}])],
+         {A, B, C, D}
+ end
+}.
+
+{translation,
+ "howl.tcp_port",
+ fun(Conf) ->
+         {_IP, Port} = cuttlefish:conf_get("ip", Conf),
+         Port
  end
 }.
 
@@ -78,7 +72,7 @@
 {translation,
  "mdns_server_lib.handler",
  fun(Conf) ->
-         Setting = cuttlefish_util:conf_get_value("tcp_callback", Conf),
+         Setting = cuttlefish:conf_get("tcp_callback", Conf),
          list_to_atom(Setting)
  end
 }.

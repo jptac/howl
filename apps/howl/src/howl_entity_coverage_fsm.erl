@@ -164,9 +164,6 @@ waiting({
 					 (Key, _Count, Keys) ->
 					      [Key | Keys]
 				      end, [], Replies),
-            statman_histogram:record_value(
-              {<<"channel/list">>, total},
-              SD0#state.start),
 	    From ! {ReqID, ok, MergedReplies},
 	    {stop, normal, SD};
         true ->

@@ -36,7 +36,6 @@ listeners(Channel) ->
     howl_entity_read_fsm:start({howl_vnode, howl}, listeners, Channel).
 
 send(Channel, Message) ->
-    Start = now(),
     case listeners(Channel) of
         {ok, not_found} ->
             ok;
@@ -45,9 +44,6 @@ send(Channel, Message) ->
             [L ! M || L <- Listeners],
             ok
     end,
-    statman_histogram:record_value(
-      {<<"delivery">>, total},
-      Start),
     ok.
 
 -ifdef(TEST).

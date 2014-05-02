@@ -5,13 +5,7 @@
 |                                                                              |
 | Please have a look at the configuraiton files:                               |
 |                                                                              |
-|  * /opt/local/fifo-howl/etc/app.config                                       |
-|    * You can change the listening port."                                     |
-|    * You can change the number of acceptors to spawn.                        |
-|                                                                              |
-|  * /opt/local/fifo-howl/etc/vm.args                                          |
-|    * You will need to change the IP in the nodename to either a resolvable   |
-|      hostname or the IP in the controll network.                             |
+|  * /opt/local/fifo-howl/etc/howl.conf                                        |
 |                                                                              |
 | Note: To enable Howl you first need to enable the epmd service.              |
 |                                                                              |

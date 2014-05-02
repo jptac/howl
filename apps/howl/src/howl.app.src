@@ -2,7 +2,7 @@
 {application, howl,
  [
   {description, "Project FiFo's messanging server."},
-  {vsn, "0.1.11"},
+  {vsn, "0.1.12"},
   {registered, []},
   {applications, [
                   kernel,
@@ -12,7 +12,6 @@
                   mdns_server_lib,
                   riak_core,
                   crypto,
-                  newrelic,
                   snmp,
                   mnesia
                  ]},
