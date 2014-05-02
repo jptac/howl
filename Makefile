@@ -14,7 +14,7 @@ quick-test:
 	$(REBAR) skip_deps=true eunit
 
 version:
-	echo "$(shell git symbolic-ref HEAD 2> /dev/null | cut -b 12-)-$(shell git log --pretty=format:'%h, %ad' -1)" > howl.version
+	git describe > howl.version
 
 version_header: version
 	echo "-define(VERSION, <<\"$(shell cat howl.version)\">>)." > apps/howl/include/howl_version.hrl
