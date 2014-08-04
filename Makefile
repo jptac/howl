@@ -36,11 +36,11 @@ test: all xref
 	$(REBAR) skip_deps=true eunit
 
 rel: all zabbix
-	-rm -r rel/howl/share
+	-rm -r rel/howl/share 2> /dev/null || true
 	$(REBAR) generate
 
 relclean:
-	rm -rf rel/howl
+	-rm -rf rel/howl 2> /dev/null || true
 
 devrel: dev1 dev2 dev3 dev4
 
