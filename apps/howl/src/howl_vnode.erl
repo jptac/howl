@@ -199,7 +199,7 @@ handle_info(cleanup, State = #state{listeners=Listeners})  ->
         0 ->
             ok;
         _ ->
-            lager:warning("Cleanup delented ~p old listeners.", [N])
+            lager:warning("Cleanup deleted ~p old listeners.", [N])
     end,
     {ok, State1};
 
