@@ -1,4 +1,4 @@
-VERSION=0.1.13
+VERSION=0.6.0
 COMPONENT_INTERNAL=howl
 COMPONENT=fifo-howl
 
@@ -13,7 +13,7 @@ build_info:
 	echo "HOMEPAGE=http://project-fifo.net/" >>build-info
 
 clean:
-	-rm *.tgz build-info packlist
+	-rm *.tgz build-info packlist 2> /dev/null || true
 
 package: package_list build_info
 	pkg_create -i install.sh -k deinstall.sh -D displayfile -B build-info -c comment -d description -f packlist -I /opt/local/$(COMPONENT) -p ../$(COMPONENT_INTERNAL) -U $(COMPONENT)-$(VERSION)$(SUFFIX).tgz

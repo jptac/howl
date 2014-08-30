@@ -24,3 +24,4 @@ rel/pkg/*.tgz
 rel/pkg/build-info
 rel/pkg/packlist
 standalone.config
+.rebar

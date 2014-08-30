@@ -8,10 +8,10 @@ cp-hooks:
 	cp hooks/* .git/hooks
 
 quick-xref:
-	$(REBAR) xref skip_deps=true
+	$(REBAR) xref skip_deps=true -r
 
 quick-test:
-	$(REBAR) skip_deps=true eunit
+	$(REBAR) skip_deps=true eunit -r
 
 version:
 	git describe > howl.version
@@ -20,13 +20,13 @@ version_header: version
 	echo "-define(VERSION, <<\"$(shell cat howl.version)\">>)." > apps/howl/include/howl_version.hrl
 
 compile: version_header
-	$(REBAR) compile
+	$(REBAR) compile -r
 
 deps:
-	$(REBAR) get-deps
+	$(REBAR) get-deps -r
 
 clean:
-	$(REBAR) clean
+	$(REBAR) clean -r
 	make -C rel/pkg clean
 
 distclean: clean devclean relclean
@@ -36,11 +36,11 @@ test: all xref
 	$(REBAR) skip_deps=true eunit
 
 rel: all zabbix
-	-rm -r rel/howl/share
+	-rm -r rel/howl/share 2> /dev/null || true
 	$(REBAR) generate
 
 relclean:
-	rm -rf rel/howl
+	-rm -rf rel/howl 2> /dev/null || true
 
 devrel: dev1 dev2 dev3 dev4
 
@@ -78,7 +78,7 @@ dev1 dev2 dev3 dev4: all zabbix
 	($(REBAR) generate target_dir=../dev/$@ overlay_vars=vars/$@.config)
 
 xref: all
-	$(REBAR) xref skip_deps=true
+	$(REBAR) xref skip_deps=true -r
 
 ##
 ## Dialyzer
