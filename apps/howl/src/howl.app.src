@@ -13,6 +13,9 @@
                   riak_core,
                   crypto,
                   snmp,
+                  lager_watchdog,
+                  folsom,
+                  folsom_ddb,
                   mnesia
                  ]},
   {mod, { howl_app, []}},
