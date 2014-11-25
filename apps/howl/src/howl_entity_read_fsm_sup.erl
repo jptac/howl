@@ -21,9 +21,6 @@ start_link() ->
 
 init([]) ->
     ReadFsm = {undefined,
-	       {
-		 howl_entity_read_fsm, start_link, []},
-	       temporary, 5000, worker, [howl_entity_read_fsm]},
-    {ok, 
-     {
-       {simple_one_for_one, 10, 10}, [ReadFsm]}}.
+               {howl_entity_read_fsm, start_link, []},
+               temporary, 5000, worker, [howl_entity_read_fsm]},
+    {ok, {{simple_one_for_one, 10, 10}, [ReadFsm]}}.
