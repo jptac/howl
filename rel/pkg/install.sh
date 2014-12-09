@@ -43,7 +43,7 @@ case $2 in
             cp ${CONFFILE}.example ${CONFFILE}
             sed --in-place -e "s/127.0.0.1/${IP}/g" ${CONFFILE}
         else
-            /opt/local/fifo-wiggle/share/update_config.sh ${CONFFILE}.example ${CONFFILE} > ${CONFFILE}.new &&
+            /opt/local/fifo-howl/share/update_config.sh ${CONFFILE}.example ${CONFFILE} > ${CONFFILE}.new &&
                 mv ${CONFFILE} ${CONFFILE}.old &&
                 mv ${CONFFILE}.new ${CONFFILE}
         fi
