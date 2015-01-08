@@ -129,3 +129,13 @@
   {default, 3},
   {commented, 3}]}.
 
+{mapping, "folsom_ddb.bucket", "folsom_ddb.bucket", [
+    merge,
+    {default, "fifo"}
+]}.
+
+{mapping, "folsom_ddb.prefix", "folsom_ddb.prefix", [
+    merge,
+    {default, "sniffle"}
+]}.
+
