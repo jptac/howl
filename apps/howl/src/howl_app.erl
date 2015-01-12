@@ -1,6 +1,7 @@
 -module(howl_app).
 
 -behaviour(application).
+-include("howl_version.hrl").
 
 %% Application callbacks
 -export([start/2, stop/1]).
@@ -20,6 +21,7 @@ start(_StartType, _StartArgs) ->
                                 [{env, [{dispatch, Dispatch}]}]),
     case howl_sup:start_link() of
         {ok, Pid} ->
+            lager_watchdog_srv:set_version(?VERSION),
             ok = riak_core:register([{vnode_module, howl_vnode}]),
             ok = riak_core_ring_events:add_guarded_handler(howl_ring_event_handler, []),
             ok = riak_core_node_watcher_events:add_guarded_handler(howl_node_event_handler, []),
