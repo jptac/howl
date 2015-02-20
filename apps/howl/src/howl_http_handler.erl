@@ -58,7 +58,7 @@ websocket_init(_Any, Req, []) ->
 
         end,
     case cowboy_req:header(<<"x-snarl-token">>, Req2) of
-        {<<Token:36/binary>>, Req3} ->
+        {Token, Req3} when is_binary(Token) ->
             {ok, Req3, #state{encoder = Encoder, decoder = Decoder,
                               type = Type, token = {token, Token}}};
         {_, Req3} ->
@@ -98,15 +98,10 @@ handle_data([{<<"ping">>, V}], Req,
             State = #state{type = Type, encoder = Enc}) ->
     {reply, {Type, Enc([{<<"pong">>, V}])}, Req, State};
 
-handle_data([{<<"token">>, <<Token:36/binary>>}], Req,
+handle_data([{<<"token">>, Token}], Req,
             State = #state{type = Type, encoder = Enc}) ->
     {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req,
      State#state{token = {token, Token}}};
-
-handle_data([{<<"token">>, _}], Req,
-            State = #state{type = Type, encoder = Enc}) ->
-    {reply, {Type, Enc([{<<"error">>, <<"invalid token">>}])}, Req,
-     State};
 
 handle_data([{<<"auth">>, Auth}], Req,
             State = #state{type = Type, encoder = Enc}) ->
