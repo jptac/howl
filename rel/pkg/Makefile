@@ -1,6 +1,8 @@
 VERSION=0.6.2
 COMPONENT_INTERNAL=howl
 COMPONENT=fifo-howl
+DEPS="erlang>=16.1.2"
+
 include ../../deps/fifo_utils/priv/pkg.mk
 
 .PHONY: prepare
