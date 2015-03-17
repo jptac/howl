@@ -1,7 +1,7 @@
 %% -*- erlang -*-
 
-%% @doc Number of acceptor processes to keep around for websocket connections.
-{mapping, "accpetors", "howl.accpetors",
+%% @doc Number of acceptors processes to keep around for websocket connections.
+{mapping, "acceptors", "howl.acceptors",
  [{default, 100},
   {datatype, integer}]}.
 
