@@ -13,6 +13,7 @@
                   riak_core,
                   crypto,
                   snmp,
+                  jsx,
                   lager_watchdog,
                   folsom_ddb,
                   mnesia
