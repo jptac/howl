@@ -14,7 +14,7 @@ start(_StartType, _StartArgs) ->
     Dispatch = cowboy_router:compile([{'_', [{'_', howl_http_handler, []}]}]),
 
     {ok, HTTPPort} = application:get_env(http_port),
-    {ok, Acceptors} = application:get_env(accpetors),
+    {ok, Acceptors} = application:get_env(acceptors),
 
 
     {ok, _} = cowboy:start_http(http, Acceptors, [{port, HTTPPort}],
