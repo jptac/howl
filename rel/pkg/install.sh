@@ -2,6 +2,8 @@
 
 USER=howl
 GROUP=$USER
+AWK=/usr/bin/awk
+SED=/usr/bin/sed
 
 case $2 in
     PRE-INSTALL)
@@ -35,14 +37,14 @@ case $2 in
     POST-INSTALL)
         svccfg import /opt/local/fifo-howl/share/howl.xml
         echo Trying to guess configuration ...
-        IP=`ifconfig net0 | grep inet | awk -e '{print $2}'`
+        IP=`ifconfig net0 | grep inet | $AWK '{print $2}'`
         CONFFILE=/opt/local/fifo-howl/etc/howl.conf
 
         if [ ! -f "${CONFFILE}" ]
         then
             echo "Creating new configuration from example file."
             cp ${CONFFILE}.example ${CONFFILE}
-            sed --in-place -e "s/127.0.0.1/${IP}/g" ${CONFFILE}
+            $SED -i bak -e "s/127.0.0.1/${IP}/g" ${CONFFILE}
         else
             echo "Merging old file with new template, the original can be found in ${CONFFILE}.old."
             /opt/local/fifo-howl/share/update_config.sh ${CONFFILE}.example ${CONFFILE} > ${CONFFILE}.new &&
