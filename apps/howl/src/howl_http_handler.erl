@@ -11,7 +11,8 @@
               websocket_info/3, websocket_terminate/3]).
 -ignore_xref([init/3, handle/2, terminate/2]).
 
--record(state, {token, encoder, decoder, type, channels=[]}).
+-record(state, {token, encoder, decoder, type, channels=[], 
+                scope_perms = [[<<"...">>]]}).
 
 init({_Andy, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
@@ -57,24 +58,18 @@ websocket_init(_Any, Req, []) ->
                  end, text, Req0}
 
         end,
-    case cowboy_req:header(<<"x-snarl-token">>, Req2) of
-        {Token, Req3} when is_binary(Token) ->
-            {ok, Req3, #state{encoder = Encoder, decoder = Decoder,
-                              type = Type, token = {token, Token}}};
-        {_, Req3} ->
-            case cowboy_req:cookie(<<"x-snarl-token">>, Req3) of
-                {<<Token:36/binary>>, Req4} ->
-                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
-                                      type = Type, token = {token, Token}}};
-                {_, Req4} ->
-                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
-                                      type = Type}}
-            end
-    end.
+    {ok, Req2, #state{encoder = Encoder, decoder = Decoder, type = Type}}.
 
 websocket_handle({Type, Raw}, Req,
-                 State = #state{type = Type, decoder = Dec}) ->
-    handle_data(Dec(Raw), Req, State);
+                 State = #state{type = Type, decoder = Dec, encoder = Enc}) ->
+    case handle_data(Dec(Raw), State) of
+        {reply, Reply, State1} ->
+            {reply, {Type, Enc(Reply)}, Req, State1};
+        {ok, State1} ->
+            {ok, Req, State1};
+        Reply ->
+            Reply
+    end;
 
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
@@ -94,51 +89,56 @@ websocket_terminate(Reason, _Req, State) ->
                   [Reason, State]),
     ok.
 
-handle_data([{<<"ping">>, V}], Req,
-            State = #state{type = Type, encoder = Enc}) ->
-    {reply, {Type, Enc([{<<"pong">>, V}])}, Req, State};
+handle_data([{<<"ping">>, V}], State) ->
+    {reply, [{<<"pong">>, V}], State};
 
-handle_data([{<<"token">>, Token}], Req,
-            State = #state{type = Type, encoder = Enc}) ->
-    {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req,
-     State#state{token = {token, Token}}};
+handle_data([{<<"token">>, Token}], State) ->
+    State1 = State#state{token = {token, Token}},
+    {reply, [{<<"ok">>, <<"authenticated">>}], State1};
 
-handle_data([{<<"auth">>, Auth}], Req,
-            State = #state{type = Type, encoder = Enc}) ->
-    {ok, User} = jsxd:get([<<"user">>], Auth),
-    {ok, Pass} = jsxd:get([<<"pass">>], Auth),
-    case libsnarl:auth(User, Pass) of
-        {ok, Token} ->
-            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req,
-             State#state{token =  Token}};
+handle_data([{<<"bearer">>, Bearer}], State) ->
+    case ls_oauth:verify_access_token(Bearer) of
+        {ok, Context} ->
+            case {proplists:get_value(<<"resource_owner">>, Context),
+                  proplists:get_value(<<"scope">>, Context)} of
+                {undefined, _} ->
+                    {reply, [{<<"error">>, <<"access_denied">>}], State};
+                {UUID, Scope} ->
+                    SPerms = scope_perms(ls_oauth:scope(Scope), []),
+                    State1 = State#state{token = UUID, scope_perms = SPerms},
+                    {reply, [{<<"ok">>, <<"authenticated">>}], State1}
+            end;
         _ ->
-            {reply, {Type, Enc([{<<"error">>, <<"authentication failed">>}])},
-             Req, State}
+            {reply, [{<<"error">>, <<"access_denied">>}], State}
     end;
 
-handle_data(_, Req, State = #state{type = Type,
-                                   encoder = Enc, token = undefined}) ->
-    {reply, {Type, Enc([{<<"error">>, <<"not authenticated">>}])}, Req, State};
+handle_data(_, State = #state{token = undefined}) ->
+    {reply, [{<<"error">>, <<"not authenticated">>}], State};
 
-handle_data([{<<"join">>, Channel}], Req,
-            State = #state{token = Token, type = Type, encoder = Enc,
-                           channels=Cs}) ->
-    case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
+handle_data([{<<"join">>, Channel}],
+            State = #state{token = Token, channels=Cs, scope_perms = SP}) ->
+    Permission = [<<"channels">>, Channel, <<"join">>],
+    case libsnarlmatch:test_perms(Permission, SP) andalso
+        libsnarl:allowed(Token, Permission) of
         true ->
             howl:listen(Channel),
-            {reply, {Type, Enc([{<<"ok">>, <<"channel joined">>}])},
-             Req, State#state{channels=[Channel | Cs]}};
+            State1 = State#state{channels=[Channel | Cs]},
+            {reply, [{<<"ok">>, <<"channel joined">>}], State1};
         _ ->
-            {reply, {Type, Enc([{<<"error">>, <<"permission denied">>}])},
-             Req, State}
+            {reply, [{<<"error">>, <<"permission denied">>}], State}
     end;
 
 
-handle_data([{<<"leave">>, Channel}], Req,
-            State = #state{type = Type, encoder = Enc, channels=Cs}) ->
+handle_data([{<<"leave">>, Channel}],
+            State = #state{channels=Cs}) ->
     howl:leave(Channel),
-    {reply, {Type, Enc([{<<"ok">>, <<"channel left">>}])}, Req,
-     State#state{channels=[C || C <- Cs, C =/= Channel]}};
+    State1 = State#state{channels=[C || C <- Cs, C =/= Channel]},
+    {reply, [{<<"ok">>, <<"channel left">>}], State1};
 
-handle_data(_JSON, Req, State) ->
-    {ok, Req, State}.
+handle_data(_JSON, State) ->
+    {ok, State}.
+
+scope_perms([], Acc) ->
+    lists:usort(Acc);
+scope_perms([{_, _, Perms} | R], Acc) ->
+    scope_perms(R, Acc ++ Perms).
