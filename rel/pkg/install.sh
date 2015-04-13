@@ -27,6 +27,8 @@ case $2 in
         else
             echo Creating howl user ...
             useradd -g $GROUP -d /var/db/howl -s /bin/false $USER
+            echo "Granting permissions to use low port numbers"
+            /usr/sbin/usermod -K defaultpriv=basic,net_privaddr $USER
         fi
         echo Creating directories ...
         mkdir -p /var/db/howl/ring
