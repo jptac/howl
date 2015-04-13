@@ -187,3 +187,13 @@
 {mapping, "http_server", "wiggle.http_server",
   [{default, off},
    merge]}.
+
+{mapping, "folsom_ddb.bucket", "folsom_ddb.bucket", [
+    merge,
+    {default, "fifo"}
+]}.
+
+{mapping, "folsom_ddb.prefix", "folsom_ddb.prefix", [
+    merge,
+    {default, "howl"}
+]}.
