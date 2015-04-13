@@ -7,6 +7,7 @@
   {applications, [
                   kernel,
                   stdlib,
+                  folsom_ddb,
                   cowboy,
                   libsnarl,
                   mdns_server_lib,
@@ -15,7 +16,6 @@
                   snmp,
                   jsx,
                   lager_watchdog,
-                  folsom_ddb,
                   wiggle,
                   mnesia
                  ]},
