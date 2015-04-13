@@ -11,8 +11,10 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    DPRules = wiggle_app:dispatchs() ++
-        [{<<"/howl/[...]">>, howl_http_handler, []}],
+    DPRules =
+        [{<<"/howl/[...]">>, howl_http_handler, []}] ++
+        wiggle_app:dispatchs(),
+
     Dispatch = cowboy_router:compile([{'_', DPRules}]),
 
     {ok, HTTPPort} = application:get_env(http_port),
