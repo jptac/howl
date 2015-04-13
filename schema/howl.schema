@@ -184,6 +184,6 @@
   end
 }.
 
-{mapping, "wiggle.http_server", "wiggle.http_server",
+{mapping, "http_server", "wiggle.http_server",
   [{default, off},
    merge]}.
