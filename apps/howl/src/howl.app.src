@@ -7,11 +7,11 @@
   {applications, [
                   kernel,
                   stdlib,
+                  riak_core,
                   folsom_ddb,
                   cowboy,
                   libsnarl,
                   mdns_server_lib,
-                  riak_core,
                   crypto,
                   snmp,
                   jsx,
