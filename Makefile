@@ -1,17 +1,17 @@
-REBAR = $(shell pwd)/rebar
+REBAR = $(shell pwd)/rebar3
 
-.PHONY: deps rel stagedevrel package version all
+.PHONY: rel stagedevrel package version all
 
-all: cp-hooks deps compile
+all: cp-hooks compile
 
 cp-hooks:
 	cp hooks/* .git/hooks
 
 quick-xref:
-	$(REBAR) xref skip_deps=true -r
+	$(REBAR) xref
 
 quick-test:
-	$(REBAR) skip_deps=true eunit -r
+	$(REBAR) eunit
 
 version:
 	@echo "$(shell git symbolic-ref HEAD 2> /dev/null | cut -b 12-)-$(shell git log --pretty=format:'%h, %ad' -1)" > howl.version
@@ -20,20 +20,14 @@ version_header: version
 	@echo "-define(VERSION, <<\"$(shell cat howl.version)\">>)." > apps/howl/include/howl_version.hrl
 
 compile: version_header
-	$(REBAR) compile -r
-
-deps:
-	$(REBAR) get-deps -r
+	$(REBAR) compile
 
 clean:
 	$(REBAR) clean -r
 	make -C rel/pkg clean
 
-distclean: clean devclean relclean
-	$(REBAR) delete-deps
-
 test: all xref
-	$(REBAR) skip_deps=true eunit
+	$(REBAR) eunit
 
 rel: all zabbix
 	-rm -r rel/howl/share 2> /dev/null || true
@@ -53,7 +47,7 @@ zabbix:
 ### Docs
 ###
 docs:
-	$(REBAR) skip_deps=true doc
+	$(REBAR) doc
 
 ##
 ## Developer targets
