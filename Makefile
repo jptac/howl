@@ -29,7 +29,10 @@ clean:
 test: xref
 	$(REBAR) eunit
 
-rel: zabbix
+update:
+	$(REBAR) update
+
+rel: update zabbix
 	-rm -r rel/howl/share 2> /dev/null || true
 	$(REBAR) release
 
