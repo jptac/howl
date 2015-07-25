@@ -32,9 +32,10 @@ test: xref
 update:
 	$(REBAR) update
 
-rel: update zabbix
-	-rm -r rel/howl/share 2> /dev/null || true
-	$(REBAR) release
+rel: update
+	$(REBAR) as prod compile
+	sh generate_zabbix_template.sh
+	$(REBAR) as prod release
 
 relclean:
 	-rm -rf rel/howl 2> /dev/null || true
@@ -44,6 +45,7 @@ package: rel
 
 zabbix:
 	sh generate_zabbix_template.sh
+
 ###
 ### Docs
 ###
