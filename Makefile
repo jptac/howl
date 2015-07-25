@@ -26,10 +26,10 @@ clean:
 	$(REBAR) clean -r
 	make -C rel/pkg clean
 
-test: all xref
+test: xref
 	$(REBAR) eunit
 
-rel: all zabbix
+rel: zabbix
 	-rm -r rel/howl/share 2> /dev/null || true
 	$(REBAR) release
 
