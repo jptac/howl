@@ -1,6 +1,6 @@
 REBAR = $(shell pwd)/rebar3
 
-.PHONY: rel stagedevrel package version all
+.PHONY: rel package version all
 
 all: cp-hooks compile
 
@@ -31,12 +31,10 @@ test: all xref
 
 rel: all zabbix
 	-rm -r rel/howl/share 2> /dev/null || true
-	$(REBAR) generate
+	$(REBAR) release
 
 relclean:
 	-rm -rf rel/howl 2> /dev/null || true
-
-devrel: dev1 dev2 dev3 dev4
 
 package: rel
 	make -C rel/pkg package
