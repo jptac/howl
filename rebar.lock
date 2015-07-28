@@ -196,7 +196,7 @@
   1},
  {<<"cowboy_oauth">>,
   {git,"https://github.com/project-fifo/cowoby_oauth.git",
-       {ref,"42a06e14ae27a7667cd794a4738c4c02150cb76b"}},
+       {ref,"0cb7712dbb6a4da1e7168fb2a4b2c7ff04d0ae7e"}},
   1},
  {<<"chash">>,
   {git,"https://github.com/Licenser/chash.git",
