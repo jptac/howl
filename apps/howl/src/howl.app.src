@@ -15,8 +15,12 @@
                   crypto,
                   snmp,
                   jsx,
+                  msgpack,
+                  jsxd,
                   lager_watchdog,
+                  fifo_utils,
                   wiggle,
+
                   mnesia
                  ]},
   {mod, { howl_app, []}},
