@@ -36,7 +36,7 @@ test: xref
 update:
 	$(REBAR) update
 
-rel: update
+rel: compile update
 	$(REBAR) as prod compile
 	sh generate_zabbix_template.sh
 	$(REBAR) as prod release
