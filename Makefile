@@ -20,6 +20,10 @@ version_header: version
 	@echo "-define(VERSION, <<\"$(shell cat howl.version)\">>)." > apps/howl/include/howl_version.hrl
 
 compile: version_header
+	-$(REBAR) compile
+	## This is trickery we need to do because of a rebar3 bug at the moment
+	rm -rf _build/default/plugins/
+	rm -rf _build/default/lib/cowboy_oauth
 	$(REBAR) compile
 
 clean:
