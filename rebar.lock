@@ -156,7 +156,7 @@
   1},
  {<<"wiggle">>,
   {git,"http://github.com/project-fifo/wiggle-app.git",
-       {ref,"005efadc4fca4ee0b99eb15e6d53e8351d540052"}},
+       {ref,"2b921dc673c71caa444d409488fb2f8ccbdeaade"}},
   0},
  {<<"riak_ensemble">>,
   {git,"https://github.com/basho/riak_ensemble.git",
