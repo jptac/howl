@@ -17,8 +17,8 @@ start(_StartType, _StartArgs) ->
 
     Dispatch = cowboy_router:compile([{'_', DPRules}]),
 
-    {ok, HTTPPort} = application:get_env(http_port),
-    {ok, Acceptors} = application:get_env(acceptors),
+    {ok, HTTPPort} = application:get_env(howl, http_port),
+    {ok, Acceptors} = application:get_env(howl, acceptors),
     {ok, Compression} = application:get_env(howl, compression),
 
 
