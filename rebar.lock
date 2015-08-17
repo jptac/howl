@@ -24,7 +24,7 @@
   0},
  {<<"cowboy_oauth">>,
   {git,"https://github.com/project-fifo/cowoby_oauth.git",
-       {ref,"585fa718d93498f752e0247d4d16ed2686fa388c"}},
+       {ref,"ae1b6a9b916d02aa56c6a50c10080980123d54e9"}},
   0},
  {<<"cowlib">>,
   {git,"git://github.com/ninenines/cowlib.git",
@@ -217,5 +217,5 @@
   1},
  {<<"wiggle">>,
   {git,"http://github.com/project-fifo/wiggle-app.git",
-       {ref,"71332320581f37d4ba740818938cfc9e17e18304"}},
+       {ref,"f1fe658c3e020b9344ff712cafde3c2b7c34f667"}},
   0}].
