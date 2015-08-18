@@ -1,6 +1,6 @@
 REBAR = $(shell pwd)/rebar3
 
-.PHONY: rel package version all
+.PHONY: rel package version all 
 
 all: cp-hooks compile
 
@@ -115,3 +115,6 @@ cleanplt:
 
 tree:
 	rebar3 tree | grep '|' | sed 's/ (.*//' > tree
+
+tree-diff: tree
+	git diff test -- tree
