@@ -1,6 +1,6 @@
 REBAR = $(shell pwd)/rebar3
 
-.PHONY: rel package version all
+.PHONY: rel package version all tree
 
 all: cp-hooks compile
 
