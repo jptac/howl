@@ -1,7 +1,7 @@
 [0m|- clique-0.0.0+build.140.ref8067df5
-|- cowboy-1.0.1
-|  |- cowlib-1.0.0
-|  |- ranch-1.0.0
+|- cowboy-1.0.2
+|  |- cowlib-1.0.1
+|  |- ranch-1.1.0
 |- cuttlefish-0.0.0+build.479.reff5f6fdc
 |  |- getopt-0.4.3
 |  |- neotoma-0.0.0+build.125.ref760928e
@@ -12,6 +12,10 @@
 |  |  |- riak_dt-0.0.0+build.307.reff7981d4
 |- fifo_utils-0.1.12
 |- folsom_ddb-0.1.15
+|  |- ddb_client-0.1.11
+|  |  |- dproto-0.1.9
+|  |  |- mmath-0.1.7
+|- howl-0.6.2
 |- jsx-1.4.5
 |- jsxd-0.1.10
 |- lager-3.0.1
@@ -46,10 +50,7 @@
 |  |  |  |- eunit_formatters-0.0.0+build.32.ref2c73eb6
 |  |  |- merl-1
 |  |- dqe-0.1.13
-|  |  |- ddb_client-0.1.11
 |  |  |- dflow-0.1.5
-|  |  |- dproto-0.1.9
-|  |  |- mmath-0.1.7
 |  |  |- qdate-0.3.0-pre
 |  |  |  |- erlang_localtime-1.0
 |  |  |  |- erlware_commons-0.15.0
