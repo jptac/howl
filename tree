@@ -9,6 +9,10 @@
 |- eper-0.90.0
 |- fifo_utils-0.1.12
 |- folsom_ddb-0.1.15
+|  |- ddb_client-0.1.11
+|  |  |- dproto-0.1.9
+|  |  |- mmath-0.1.7
+|- howl-0.6.2
 |- jsx-1.4.5
 |- jsxd-0.1.10
 |- lager-3.0.1
@@ -25,7 +29,7 @@
 |  |- mdns_server-0.1.1
 |- msgpack-0.0.0+build.223.refc666a5f
 |- recon-2.2.0
-|- riak_core-0.0.0+build.1758.refaf8cc7b
+|- riak_core-git
 |  |- basho_stats-1.0.3
 |  |- chash-0.1.1
 |  |- eleveldb-0.0.0+build.494.refa36dbd6
@@ -44,10 +48,7 @@
 |  |  |  |- eunit_formatters-0.0.0+build.32.ref2c73eb6
 |  |  |- merl-1
 |  |- dqe-0.1.13
-|  |  |- ddb_client-0.1.11
 |  |  |- dflow-0.1.5
-|  |  |- dproto-0.1.9
-|  |  |- mmath-0.1.7
 |  |  |- qdate-0.3.0-pre
 |  |  |  |- erlang_localtime-1.0
 |  |  |  |- erlware_commons-0.15.0

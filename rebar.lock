@@ -28,7 +28,7 @@
   {git,"https://github.com/tsloughter/cuttlefish.git",
        {ref,"f5f6fdc1b0dd8ebe909b81f0b38f5715d4e869e6"}},
   0},
- {<<"ddb_client">>,{pkg,<<"ddb_client">>,<<"0.1.11">>},2},
+ {<<"ddb_client">>,{pkg,<<"ddb_client">>,<<"0.1.11">>},1},
  {<<"dflow">>,{pkg,<<"dflow">>,<<"0.1.5">>},2},
  {<<"dproto">>,{pkg,<<"dproto">>,<<"0.1.9">>},2},
  {<<"dqe">>,
