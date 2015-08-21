@@ -11,7 +11,7 @@
               websocket_info/3, websocket_terminate/3]).
 -ignore_xref([init/3, handle/2, terminate/2]).
 
--record(state, {token, encoder, decoder, type, channels=[], 
+-record(wsstate, {token, encoder, decoder, type, channels=[], 
                 scope_perms = [[<<"...">>]]}).
 
 init({_Andy, http}, _Req, _Opts) ->
@@ -21,7 +21,7 @@ websocket_init(_Any, Req, []) ->
     {ok, [C|_], Req0} =
         cowboy_req:parse_header(
           <<"sec-websocket-protocol">>,
-          Req, [<<"json">>]),
+          Req, [unset]),
     Req1 = cowboy_req:compact(Req0),
     {Encoder, Decoder, Type, Req2} =
         case C of
@@ -49,7 +49,7 @@ websocket_init(_Any, Req, []) ->
                  fun(D) ->
                          jsxd:from_list(jsx:decode(D))
                  end, text, ReqX};
-            <<>> ->
+            unset ->
                 {fun(O) ->
                          jsx:encode(O)
                  end,
@@ -58,10 +58,47 @@ websocket_init(_Any, Req, []) ->
                  end, text, Req0}
 
         end,
-    {ok, Req2, #state{encoder = Encoder, decoder = Decoder, type = Type}}.
+    State = #wsstate{encoder = Encoder, decoder = Decoder, type = Type},
+
+    R = case cowboy_req:qs_val(<<"fifo_ott">>, Req2) of
+            {undefined, Req3} ->
+                {no_token, Req3, State};
+            {OTT, Req3} ->
+                case ls_token:get(OTT) of
+                    {ok, Bearer} ->
+                        ls_token:delete(OTT),
+                        case ls_oauth:verify_access_token(Bearer) of
+                            {ok, Context} ->
+                                case {proplists:get_value(<<"resource_owner">>, Context),
+                                      proplists:get_value(<<"scope">>, Context)} of
+                                    {undefined, _} ->
+                                        {denied, Req3, State};
+                                    {UUID, Scope} ->
+                                        SPerms = scope_perms(ls_oauth:scope(Scope), []),
+                                        State1 = State#wsstate{token = UUID, scope_perms = SPerms},
+                                        {ok, Req3, State1}
+                                end;
+                            _ ->
+                                {denied, Req3, State}
+                    end;
+                _ ->
+                        {denied, Req3, State}
+                end
+        end,
+    case R of
+        {no_token, Req4, State} ->
+            {ok, Req5} = cowboy_req:reply(401, [], <<"ott required">>, Req4),
+            {shutdown, Req5};
+        {denied, Req4, State} ->
+            {ok, Req5} = cowboy_req:reply(403, [], <<"permission denied">>, Req4),
+            {shutdown, Req5};
+        R ->
+            R
+    end.
+
 
 websocket_handle({Type, Raw}, Req,
-                 State = #state{type = Type, decoder = Dec, encoder = Enc}) ->
+                 State = #wsstate{type = Type, decoder = Dec, encoder = Enc}) ->
     case handle_data(Dec(Raw), State) of
         {reply, Reply, State1} ->
             {reply, {Type, Enc(Reply)}, Req, State1};
@@ -74,13 +111,13 @@ websocket_handle({Type, Raw}, Req,
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
-websocket_info({msg, Msg}, Req, State = #state{type = Type, encoder = Enc}) ->
+websocket_info({msg, Msg}, Req, State = #wsstate{type = Type, encoder = Enc}) ->
     {reply, {Type, Enc(Msg)}, Req, State};
 
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
-websocket_terminate(normal, _Req, #state{channels = Cs}) ->
+websocket_terminate(normal, _Req, #wsstate{channels = Cs}) ->
     [howl:leave(C) || C <- Cs],
     ok;
 
@@ -93,7 +130,7 @@ handle_data([{<<"ping">>, V}], State) ->
     {reply, [{<<"pong">>, V}], State};
 
 handle_data([{<<"token">>, Token}], State) ->
-    State1 = State#state{token = {token, Token}},
+    State1 = State#wsstate{token = {token, Token}},
     {reply, [{<<"ok">>, <<"authenticated">>}], State1};
 
 handle_data([{<<"bearer">>, Bearer}], State) ->
@@ -105,24 +142,24 @@ handle_data([{<<"bearer">>, Bearer}], State) ->
                     {reply, [{<<"error">>, <<"access_denied">>}], State};
                 {UUID, Scope} ->
                     SPerms = scope_perms(ls_oauth:scope(Scope), []),
-                    State1 = State#state{token = UUID, scope_perms = SPerms},
+                    State1 = State#wsstate{token = UUID, scope_perms = SPerms},
                     {reply, [{<<"ok">>, <<"authenticated">>}], State1}
             end;
         _ ->
             {reply, [{<<"error">>, <<"access_denied">>}], State}
     end;
 
-handle_data(_, State = #state{token = undefined}) ->
+handle_data(_, State = #wsstate{token = undefined}) ->
     {reply, [{<<"error">>, <<"not authenticated">>}], State};
 
 handle_data([{<<"join">>, Channel}],
-            State = #state{token = Token, channels=Cs, scope_perms = SP}) ->
+            State = #wsstate{token = Token, channels=Cs, scope_perms = SP}) ->
     Permission = [<<"channels">>, Channel, <<"join">>],
     case libsnarlmatch:test_perms(Permission, SP) andalso
         libsnarl:allowed(Token, Permission) of
         true ->
             howl:listen(Channel),
-            State1 = State#state{channels=[Channel | Cs]},
+            State1 = State#wsstate{channels=[Channel | Cs]},
             {reply, [{<<"ok">>, <<"channel joined">>}], State1};
         _ ->
             {reply, [{<<"error">>, <<"permission denied">>}], State}
@@ -130,9 +167,9 @@ handle_data([{<<"join">>, Channel}],
 
 
 handle_data([{<<"leave">>, Channel}],
-            State = #state{channels=Cs}) ->
+            State = #wsstate{channels=Cs}) ->
     howl:leave(Channel),
-    State1 = State#state{channels=[C || C <- Cs, C =/= Channel]},
+    State1 = State#wsstate{channels=[C || C <- Cs, C =/= Channel]},
     {reply, [{<<"ok">>, <<"channel left">>}], State1};
 
 handle_data(_JSON, State) ->
@@ -140,5 +177,5 @@ handle_data(_JSON, State) ->
 
 scope_perms([], Acc) ->
     lists:usort(Acc);
-scope_perms([{_, _, Perms} | R], Acc) ->
+scope_perms([{_, _, _, Perms} | R], Acc) ->
     scope_perms(R, Acc ++ Perms).
