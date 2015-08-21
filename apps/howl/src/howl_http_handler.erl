@@ -11,8 +11,8 @@
               websocket_info/3, websocket_terminate/3]).
 -ignore_xref([init/3, handle/2, terminate/2]).
 
--record(wsstate, {token, encoder, decoder, type, channels=[], 
-                scope_perms = [[<<"...">>]]}).
+-record(wsstate, {token, encoder, decoder, type, channels=[],
+                  scope_perms = [[<<"...">>]]}).
 
 init({_Andy, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
@@ -87,8 +87,13 @@ websocket_init(_Any, Req, []) ->
         end,
     case R of
         {no_token, Req4, State} ->
-            {ok, Req5} = cowboy_req:reply(401, [], <<"ott required">>, Req4),
-            {shutdown, Req5};
+            case cowboy_req:binding(version, Req4) of
+                {<<"0.1.0">>, Req5} ->
+                    {ok, Req5, State};
+                {_, Req5} ->
+                    {ok, Req6} = cowboy_req:reply(401, [], <<"ott required">>, Req5),
+                    {shutdown, Req6}
+            end;
         {denied, Req4, State} ->
             {ok, Req5} = cowboy_req:reply(403, [], <<"permission denied">>, Req4),
             {shutdown, Req5};
