@@ -99,7 +99,7 @@
   1},
  {<<"goldrush">>,
   {git,"git://github.com/DeadZen/goldrush.git",
-       {ref,"71e63212f12c25827e0c1b4198d37d5d018a7fec"}},
+       {ref,"64864ba7fcf40988361340e48680b49a2c2938cf"}},
   1},
  {<<"jesse">>,
   {git,"https://github.com/klarna/jesse.git",
@@ -201,5 +201,5 @@
   1},
  {<<"wiggle">>,
   {git,"http://github.com/project-fifo/wiggle-app.git",
-       {ref,"52fc3c8ba37364e5fdd1f8aadb14ad10321e877a"}},
+       {ref,"36fe114f92acd6e49d28ac8602de9471a46f27ad"}},
   0}].
