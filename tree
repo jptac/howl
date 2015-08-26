@@ -11,15 +11,15 @@
 |  |- fifo_dt-0.1.51
 |  |  |- riak_dt-0.0.0+build.307.reff7981d4
 |- fifo_utils-0.1.12
-|- folsom_ddb-0.1.15
-|  |- ddb_client-0.1.11
+|- folsom_ddb-0.1.16
+|  |- ddb_client-0.1.12
 |  |  |- dproto-0.1.9
 |  |  |- mmath-0.1.7
 |- howl-0.6.2
 |- jsx-1.4.5
 |- jsxd-0.1.10
 |- lager-3.0.1
-|  |- goldrush-0.1.6
+|  |- goldrush-0.1.7
 |- lager_watchdog-0.1.10
 |- libsnarl-0.3.24
 |  |- libsnarlmatch-0.1.6
@@ -30,8 +30,9 @@
 |- mdns_server_lib-0.1.19
 |  |- mdns_server-0.1.1
 |- msgpack-0.2.3
+|- poolboy-1.5.1
 |- recon-2.2.0
-|- riak_core-git
+|- riak_core-0.0.0+build.1758.refaf8cc7b
 |  |- basho_stats-1.0.3
 |  |- chash-0.1.1
 |  |- eleveldb-0.0.0+build.494.refa36dbd6
@@ -41,7 +42,6 @@
 |  |  |- parse_trans-0.0.0+build.106.ref82cc002
 |  |  |- setup-0.0.0+build.79.ref51ee7c9
 |  |- pbkdf2-0.0.0+build.2676.ref7076584
-|  |- poolboy-0.0.0+build.124.ref8bb45fb
 |  |- riak_sysmon-2.0.0
 |- riak_ensemble-0.0.0+build.113.refe0652c6
 |- wiggle-0.6.2
@@ -49,7 +49,7 @@
 |  |  |- erlydtl-0.0.0+build.757.reff8602ca
 |  |  |  |- eunit_formatters-0.0.0+build.32.ref2c73eb6
 |  |  |- merl-1
-|  |- dqe-0.1.13
+|  |- dqe-0.1.15
 |  |  |- dflow-0.1.5
 |  |  |- qdate-0.3.0-pre
 |  |  |  |- erlang_localtime-1.0
