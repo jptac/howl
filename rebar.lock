@@ -201,5 +201,5 @@
   1},
  {<<"wiggle">>,
   {git,"http://github.com/project-fifo/wiggle-app.git",
-       {ref,"dd20e29c8691ef2e624b257e09e5a2c9d0bbe074"}},
+       {ref,"6ced7efb28fd40868971bea6840a1dd86a5a1a7d"}},
   0}].
