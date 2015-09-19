@@ -13,7 +13,7 @@
 start(_StartType, _StartArgs) ->
     DPRules =
         [{<<"/howl/[...]">>, howl_http_handler, []}] ++
-        wiggle_app:dispatchs(),
+        wiggle_app:dispatches(),
 
     Dispatch = cowboy_router:compile([{'_', DPRules}]),
 
