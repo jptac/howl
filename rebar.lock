@@ -21,7 +21,7 @@
  {<<"cowboy">>,{pkg,<<"cowboy">>,<<"1.0.2">>},0},
  {<<"cowboy_oauth">>,
   {git,"https://github.com/project-fifo/cowoby_oauth.git",
-       {ref,"43b61354dfd4c400936af7086f6d9890f97b4c96"}},
+       {ref,"8c93d0b7aac4b8538558247216365d3c10b8842b"}},
   1},
  {<<"cowlib">>,{pkg,<<"cowlib">>,<<"1.0.1">>},1},
  {<<"cuttlefish">>,
@@ -201,5 +201,5 @@
   1},
  {<<"wiggle">>,
   {git,"http://github.com/project-fifo/wiggle-app.git",
-       {ref,"1910808099f4368b634165e4e17f967188d3639b"}},
+       {ref,"2fa4767be39a7960133d81f2825cda5d2462b9c3"}},
   0}].
