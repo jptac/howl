@@ -58,7 +58,7 @@
   2},
  {<<"erlware_commons">>,
   {git,"git://github.com/erlware/erlware_commons.git",
-       {ref,"26c600922ebdec33eb9ffd05492bd0d24f2c3e16"}},
+       {ref,"49bc69e35a282bde4a0a6a8f211b5f77d8585256"}},
   3},
  {<<"erlydtl">>,
   {git,"https://github.com/erlydtl/erlydtl.git",
@@ -201,5 +201,5 @@
   1},
  {<<"wiggle">>,
   {git,"http://github.com/project-fifo/wiggle-app.git",
-       {ref,"6b42829717fde9e42cd3846a0d4374714aa70113"}},
+       {ref,"e4e542e25968728d3d0ec61b3fe56942969bf474"}},
   0}].
