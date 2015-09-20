@@ -74,7 +74,7 @@ websocket_init(_Any, Req, []) ->
                                     {undefined, _} ->
                                         {denied, Req3, State};
                                     {UUID, Scope} ->
-                                        SPerms = scope_perms(ls_oauth:scope(Scope), []),
+                                        SPerms = cowboy_oauth:scope_perms(ls_oauth:scope(Scope), []),
                                         State1 = State#wsstate{token = UUID, scope_perms = SPerms},
                                         {ok, Req3, State1}
                                 end;
@@ -146,7 +146,7 @@ handle_data([{<<"bearer">>, Bearer}], State) ->
                 {undefined, _} ->
                     {reply, [{<<"error">>, <<"access_denied">>}], State};
                 {UUID, Scope} ->
-                    SPerms = scope_perms(ls_oauth:scope(Scope), []),
+                    SPerms = cowboy_oauth:scope_perms(ls_oauth:scope(Scope), []),
                     State1 = State#wsstate{token = UUID, scope_perms = SPerms},
                     {reply, [{<<"ok">>, <<"authenticated">>}], State1}
             end;
@@ -179,8 +179,3 @@ handle_data([{<<"leave">>, Channel}],
 
 handle_data(_JSON, State) ->
     {ok, State}.
-
-scope_perms([], Acc) ->
-    lists:usort(Acc);
-scope_perms([{_, _, _, Perms} | R], Acc) ->
-    scope_perms(R, Acc ++ Perms).
