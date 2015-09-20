@@ -53,7 +53,7 @@
    │  ├─ dflow─0.1.5
    │  └─ qdate─0.3.0-pre
    │     ├─ erlang_localtime─1.0
-   │     └─ erlware_commons─0.15.0
+   │     └─ erlware_commons─0.16.0
    ├─ e2qc─1.0
    ├─ fifo_s3─0.1.11
    │  ├─ base16─0.0.0+build.9.ref1e9dd28
