@@ -19,6 +19,7 @@
                   jsxd,
                   lager_watchdog,
                   fifo_utils,
+                  fifo_spec,
                   wiggle,
 
                   mnesia
