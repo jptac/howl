@@ -108,9 +108,7 @@ websocket_handle({Type, Raw}, Req,
         {reply, Reply, State1} ->
             {reply, {Type, Enc(Reply)}, Req, State1};
         {ok, State1} ->
-            {ok, Req, State1};
-        Reply ->
-            Reply
+            {ok, Req, State1}
     end;
 
 websocket_handle(_Any, Req, State) ->
