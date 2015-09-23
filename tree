@@ -17,8 +17,8 @@
 ├─ lager─3.0.1
 │  └─ goldrush─0.1.7
 ├─ lager_watchdog─0.1.10
-├─ libsnarl─0.3.28
-│  ├─ fifo_spec─0.1.20
+├─ libsnarl─0.3.30
+│  ├─ fifo_spec─0.1.21
 │  ├─ libsnarlmatch─0.1.6
 │  ├─ mdns_client_lib─0.1.26
 │  │  ├─ mdns_client─0.1.4
