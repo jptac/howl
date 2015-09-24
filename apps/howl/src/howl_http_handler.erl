@@ -94,7 +94,7 @@ get_token(State, Req) ->
                                 {undefined, _} ->
                                     {denied, Req1, State};
                                 {UUID, Scope} ->
-                                    Scopes = ls_oauth:scope(Scope),
+                                    {ok, Scopes} = ls_oauth:scope(Scope),
                                     SPerms = cowboy_oauth:scope_perms(Scopes, []),
                                     State1 = State#wsstate{token = UUID, scope_perms = SPerms},
                                     {ok, Req1, State1}
