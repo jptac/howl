@@ -1,9 +1,3 @@
-                                   "http://github.com/project-fifo/wiggle-app.git",
-                                   {ref,
-                                    "0aa2b42caa3262126eb42050d0e206839981bc0f"}})
-                                         "https://github.com/project-fifo/cowoby_oauth.git",
-                                         {ref,
-                                          "30a0a54d088a739a66df042f6ba7324d0a9f3ef9"}})
 [0m├─ clique─0.3.1+build.140.ref8067df5
 ├─ cowboy─1.0.2
 │  └─ cowlib─1.0.1
@@ -13,10 +7,10 @@
 ├─ edown─0.7+build.147.refc770057
 ├─ eper─0.94.0
 ├─ fifo_utils─0.1.13
-├─ folsom_ddb─0.1.16
-│  └─ ddb_client─0.1.12
-│     ├─ dproto─0.1.9
-│     └─ mmath─0.1.7
+├─ folsom_ddb─0.1.17
+│  └─ ddb_client─0.1.13
+│     ├─ dproto─0.1.10
+│     └─ mmath─0.1.13
 ├─ howl─0.6.2
 ├─ jsx─1.4.5
 ├─ jsxd─0.1.10
