@@ -17,11 +17,11 @@
 ├─ lager─3.0.1
 │  └─ goldrush─0.1.7
 ├─ lager_watchdog─0.1.10
-├─ libsnarl─0.3.30
+├─ libsnarl─0.3.31
 │  ├─ fifo_spec─0.1.21
 │  ├─ libsnarlmatch─0.1.6
-│  ├─ mdns_client_lib─0.1.26
-│  │  ├─ mdns_client─0.1.4
+│  ├─ mdns_client_lib─0.1.27
+│  │  ├─ mdns_client─0.1.5
 │  │  └─ pooler─1.4.0
 │  └─ oauth2─0.6.0
 ├─ mdns_server_lib─0.1.19
@@ -43,7 +43,7 @@
 │  └─ riak_sysmon─2.0.0
 ├─ riak_ensemble─2.0.0
 └─ wiggle─0.6.2
-   ├─ cowboy_oauth─0.2.10
+   ├─ cowboy_oauth─0.2.11
    │  ├─ erlydtl─0.9.2+build.760.ref5ac24d1
    │  │  └─ eunit_formatters─0.1.2+build.32.ref2c73eb6
    │  └─ merl─1
@@ -55,11 +55,11 @@
    ├─ e2qc─1.0
    ├─ fifo_dt─0.1.54
    │  └─ riak_dt─2.1.0
-   ├─ fifo_s3─0.1.12
+   ├─ fifo_s3─0.1.13
    │  ├─ base16─1.0
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5
    ├─ libchunter─0.1.40
-   ├─ libsniffle─0.3.27
+   ├─ libsniffle─0.3.28
    ├─ meck─0.8.2
    └─ uuid─0.4.7
