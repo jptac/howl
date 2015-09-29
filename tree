@@ -55,7 +55,7 @@
    ├─ e2qc─1.0
    ├─ fifo_dt─0.1.54
    │  └─ riak_dt─2.1.0
-   ├─ fifo_s3─0.1.12
+   ├─ fifo_s3─0.1.13
    │  ├─ base16─1.0
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5

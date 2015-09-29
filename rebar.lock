@@ -78,7 +78,7 @@
   1},
  {<<"fifo_s3">>,
   {git,"https://github.com/project-fifo/fifo_s3.git",
-       {ref,"45281d1b0d45871a18cb73732baed37f148117d0"}},
+       {ref,"659d81983a29aa6c0e9000f47985bbcad584f62f"}},
   1},
  {<<"fifo_spec">>,
   {git,"https://github.com/project-fifo/fifo_spec.git",
@@ -201,5 +201,5 @@
   1},
  {<<"wiggle">>,
   {git,"http://github.com/project-fifo/wiggle-app.git",
-       {ref,"98d258f8c78c1a5f9810fd127fd1dfffc3b04226"}},
+       {ref,"fa13dd779dcb6a23e9231741b4c67cc5f16bd3ae"}},
   0}].
