@@ -7,10 +7,10 @@
 ├─ edown─0.7+build.147.refc770057
 ├─ eper─0.94.0
 ├─ fifo_utils─0.1.13
-├─ folsom_ddb─0.1.18
-│  └─ ddb_client─0.1.14
-│     ├─ dproto─0.1.10
-│     └─ mmath─0.1.14
+├─ folsom_ddb─0.1.19
+│  └─ ddb_client─0.1.16
+│     ├─ dproto─0.1.12
+│     └─ mmath─0.1.15
 ├─ howl─0.7.0
 ├─ jsx─1.4.5
 ├─ jsxd─0.1.10
