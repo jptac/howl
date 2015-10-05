@@ -6,7 +6,7 @@
 │  └─ neotoma─1.7.2
 ├─ edown─0.7+build.147.refc770057
 ├─ eper─0.94.0
-├─ fifo_utils─0.1.14
+├─ fifo_utils─0.1.15
 ├─ folsom_ddb─0.1.19
 │  └─ ddb_client─0.1.16
 │     ├─ dproto─0.1.12
