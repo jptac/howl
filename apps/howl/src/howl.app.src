@@ -17,7 +17,7 @@
                   jsx,
                   msgpack,
                   jsxd,
-                  lager_watchdog,
+                  fifo_lager,
                   fifo_utils,
                   fifo_spec,
                   wiggle,
