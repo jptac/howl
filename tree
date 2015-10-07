@@ -8,7 +8,8 @@
 ├─ eper─0.94.0
 ├─ fifo_lager─0.1.0
 │  ├─ lager_graylog─1
-│  └─ lager_logstash_backend─0.0.2
+│  ├─ lager_logstash_backend─0.0.2
+│  └─ lager_watchdog─0.1.10
 ├─ fifo_utils─0.1.16
 ├─ folsom_ddb─0.1.19
 │  └─ ddb_client─0.1.16
@@ -17,9 +18,8 @@
 ├─ howl─0.7.0
 ├─ jsx─1.4.5
 ├─ jsxd─0.1.10
-├─ lager─3.0.1
-│  └─ goldrush─0.1.7
-├─ lager_watchdog─0.1.10
+├─ lager─2.1.1
+│  └─ goldrush─0.1.6
 ├─ libsnarl─0.3.32
 │  ├─ fifo_spec─0.1.21
 │  ├─ libsnarlmatch─0.1.6
