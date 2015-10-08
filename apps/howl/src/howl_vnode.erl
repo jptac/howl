@@ -195,7 +195,12 @@ handle_info(cleanup, State = #state{listeners=Listeners})  ->
                                     {N + 1, delete_listener(P, Acc)}
                             end
                     end, {0, State}, Listeners),
-    lager:debug("Cleanup deleted ~p old listeners.", [N]),
+    case N of
+        0 ->
+            ok;
+        _ ->
+            lager:debug("Cleanup deleted ~p old listeners.", [N])
+    end,
     {ok, State1};
 
 handle_info(_Msg, State)  ->
