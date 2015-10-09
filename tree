@@ -11,8 +11,8 @@
 │  ├─ lager_logstash_backend─0.0.2
 │  └─ lager_watchdog─0.1.10
 ├─ fifo_utils─0.1.16
-├─ folsom_ddb─0.1.19
-│  └─ ddb_client─0.1.16
+├─ folsom_ddb─0.1.20
+│  └─ ddb_client─0.1.17
 │     ├─ dproto─0.1.12
 │     └─ mmath─0.1.15
 ├─ howl─0.7.0
@@ -50,7 +50,7 @@
    │  ├─ erlydtl─0.9.2+build.760.ref5ac24d1
    │  │  └─ eunit_formatters─0.1.2+build.32.ref2c73eb6
    │  └─ merl─1
-   ├─ dqe─0.1.20
+   ├─ dqe─0.1.22
    │  ├─ dflow─0.1.5
    │  └─ qdate─0.3.0-pre
    │     ├─ erlang_localtime─1.0
