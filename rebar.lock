@@ -33,7 +33,7 @@
  {<<"dproto">>,{pkg,<<"dproto">>,<<"0.1.12">>},2},
  {<<"dqe">>,
   {git,"https://github.com/dalmatinerdb/dqe.git",
-       {ref,"f986b3ae5195755e4f46e84288eb5c4aff689b6d"}},
+       {ref,"d8667e488c1caa1c05242532baaaa5550d31136e"}},
   1},
  {<<"e2qc">>,
   {git,"https://github.com/arekinath/e2qc.git",
@@ -204,5 +204,5 @@
   1},
  {<<"wiggle">>,
   {git,"http://github.com/project-fifo/wiggle-app.git",
-       {ref,"f5218e32813a5f7afcbb6b73186827d29aedfd36"}},
+       {ref,"1a8ffa8093c8628dd090a3821e5f9e1666713919"}},
   0}].
