@@ -2,16 +2,11 @@
 
 USER=howl
 GROUP=$USER
+AWK=/usr/bin/awk
+SED=/usr/bin/sed
 
 case $2 in
     PRE-INSTALL)
-        #if grep '^Image: base64 1[34].[1234].*$' /etc/product
-        #then
-        #    echo "Image version supported"
-        #else
-        #    echo "This image version is not supported please use the base64 13.2.1 image or later."
-        #    exit 1
-        #fi
         if grep "^$GROUP:" /etc/group > /dev/null 2>&1
         then
             echo "Group already exists, skipping creation."
@@ -25,6 +20,8 @@ case $2 in
         else
             echo Creating howl user ...
             useradd -g $GROUP -d /var/db/howl -s /bin/false $USER
+            echo "Granting permissions to use low port numbers"
+            /usr/sbin/usermod -K defaultpriv=basic,net_privaddr $USER
         fi
         echo Creating directories ...
         mkdir -p /var/db/howl/ring
@@ -35,19 +32,19 @@ case $2 in
     POST-INSTALL)
         svccfg import /opt/local/fifo-howl/share/howl.xml
         echo Trying to guess configuration ...
-        IP=`ifconfig net0 | grep inet | awk -e '{print $2}'`
+        IP=`ifconfig net0 | grep inet | $AWK '{print $2}'`
         CONFFILE=/opt/local/fifo-howl/etc/howl.conf
 
         if [ ! -f "${CONFFILE}" ]
         then
             echo "Creating new configuration from example file."
             cp ${CONFFILE}.example ${CONFFILE}
-            sed --in-place -e "s/127.0.0.1/${IP}/g" ${CONFFILE}
+            $SED -i bak -e "s/127.0.0.1/${IP}/g" ${CONFFILE}
         else
-            echo "Merging old file with new template, the original can be found in ${CONFFILE}.old."
-            /opt/local/fifo-howl/share/update_config.sh ${CONFFILE}.example ${CONFFILE} > ${CONFFILE}.new &&
-                mv ${CONFFILE} ${CONFFILE}.old &&
-                mv ${CONFFILE}.new ${CONFFILE}
+            echo "Please make sure you update your config according to the update manual!"
+            #/opt/local/fifo-sniffle/share/update_config.sh ${CONFFILE}.example ${CONFFILE} > ${CONFFILE}.new &&
+            #    mv ${CONFFILE} ${CONFFILE}.old &&
+            #    mv ${CONFFILE}.new ${CONFFILE}
         fi
         ;;
 esac

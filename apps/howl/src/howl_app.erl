@@ -11,14 +11,47 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
-    Dispatch = cowboy_router:compile([{'_', [{'_', howl_http_handler, []}]}]),
+    DPRules =
+        [{<<"/howl/[...]">>, howl_http_handler, []}] ++
+        wiggle_app:dispatches(),
 
-    {ok, HTTPPort} = application:get_env(http_port),
-    {ok, Acceptors} = application:get_env(accpetors),
+    Dispatch = cowboy_router:compile([{'_', DPRules}]),
+
+    {ok, HTTPPort} = application:get_env(howl, http_port),
+    {ok, Acceptors} = application:get_env(howl, acceptors),
+    {ok, Compression} = application:get_env(howl, compression),
 
 
     {ok, _} = cowboy:start_http(http, Acceptors, [{port, HTTPPort}],
                                 [{env, [{dispatch, Dispatch}]}]),
+    case application:get_env(howl, ssl) of
+        {ok, on} ->
+            {ok, SSLPort} = application:get_env(howl, ssl_port),
+            {ok, SSLCA} = application:get_env(howl, ssl_cacertfile),
+            {ok, SSLCert} = application:get_env(howl, ssl_certfile),
+            {ok, SSLKey} = application:get_env(howl, ssl_keyfile),
+            {ok, _} = cowboy:start_https(https, Acceptors,
+                                         [{port, SSLPort},
+                                          {cacertfile, SSLCA},
+                                          {certfile, SSLCert},
+                                          {keyfile, SSLKey}],
+                                         [{compress, Compression},
+                                          {env, [{dispatch, Dispatch}]}]);
+        {ok, spdy} ->
+            {ok, SSLPort} = application:get_env(howl, ssl_port),
+            {ok, SSLCA} = application:get_env(howl, ssl_cacertfile),
+            {ok, SSLCert} = application:get_env(howl, ssl_certfile),
+            {ok, SSLKey} = application:get_env(howl, ssl_keyfile),
+            {ok, _} = cowboy:start_spdy(spdy, Acceptors,
+                                        [{port, SSLPort},
+                                         {cacertfile, SSLCA},
+                                         {certfile, SSLCert},
+                                         {keyfile, SSLKey}],
+                                        [{compress, Compression},
+                                         {env, [{dispatch, Dispatch}]}]);
+        _ ->
+            ok
+    end,
     case howl_sup:start_link() of
         {ok, Pid} ->
             lager_watchdog_srv:set_version(?VERSION),

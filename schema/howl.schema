@@ -1,7 +1,7 @@
 %% -*- erlang -*-
 
-%% @doc Number of acceptor processes to keep around for websocket connections.
-{mapping, "accpetors", "howl.accpetors",
+%% @doc Number of acceptors processes to keep around for websocket connections.
+{mapping, "acceptors", "howl.acceptors",
  [{default, 100},
   {datatype, integer}]}.
 
@@ -9,6 +9,37 @@
 {mapping, "http_port", "howl.http_port",
  [{default, {{http_port}} },
   {datatype, integer}]}.
+
+%% @doc Enable or disable compression
+{mapping, "compression", "howl.compression",
+ [{default, on},
+  {datatype, flag}]}.
+
+%% @doc Enable or disable SSL compression
+{mapping, "ssl", "howl.ssl",
+ [{default, on},
+  {datatype, {enum, [on, off, spdy]}}]}.
+
+%% @doc The port howl listens to.
+{mapping, "ssl.port", "howl.ssl_port",
+ [{default, {{ssl_port}} },
+  {datatype, integer}]}.
+
+%% @doc The SSL CA certificate.
+{mapping, "ssl.cacertfile", "howl.ssl_cacertfile",
+ [{default, "/var/db/fifo/fifo.crt"},
+  {datatype, string}]}.
+
+%% @doc The SSL Server certificate
+{mapping, "ssl.certfile", "howl.ssl_certfile",
+ [{default, "/var/db/fifo/fifo.pem"},
+  {datatype, string}]}.
+
+%% @doc The SSL Key file
+{mapping, "ssl.keyfile", "howl.ssl_keyfile",
+ [{default, "/var/db/fifo/fifo.key"},
+  {datatype, string}]}.
+
 
 %% @doc The TCP endpoint that will be broadcasted.
 {mapping, "ip", "mdns_server_lib.listener",
@@ -96,7 +127,7 @@
 %% the manual at http://bit.ly/1ciKRkS
 {mapping, "ring_size", "riak_core.ring_creation_size",
  [{datatype, integer},
-  {default, 8},
+  {default, 64},
   {commented, 64},
   {validators, ["ring_size"]}
  ]}.
@@ -136,6 +167,41 @@
 
 {mapping, "folsom_ddb.prefix", "folsom_ddb.prefix", [
     merge,
-    {default, "sniffle"}
+    {default, "howl@127.0.0.1"}
 ]}.
 
+%% @doc Schema directory
+{mapping, "schema_dir", "riak_core.schema_dirs",
+ [{default, "./share/schema"},
+  {datatype, string}]
+}.
+
+{translation,
+  "riak_core.schema_dirs",
+  fun(Conf) ->
+          D = cuttlefish:conf_get("schema_dir", Conf),
+          [D]
+  end
+}.
+
+{mapping, "http_server", "wiggle.http_server",
+  [{default, off},
+   merge]}.
+
+{mapping, "folsom_ddb.bucket", "folsom_ddb.bucket", [
+    merge,
+    {default, "fifo"}
+]}.
+
+{mapping, "folsom_ddb.prefix", "folsom_ddb.prefix", [
+    merge,
+    {default, "howl"}
+]}.
+
+%% @doc handoff.ip is the network address that Riak binds to for
+%% intra-cluster data handoff.
+{mapping, "handoff.ip", "riak_core.handoff_ip", [
+  {default, "127.0.0.1" },
+  {datatype, string},
+  {validators, ["valid_ipaddr"]}
+]}.

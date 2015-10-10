@@ -1,59 +1,56 @@
-REBAR = $(shell pwd)/rebar
+REBAR = $(shell pwd)/rebar3
 
-.PHONY: deps rel stagedevrel package version all
+.PHONY: rel package version all tree
 
-all: cp-hooks deps compile
+all: cp-hooks compile
 
 cp-hooks:
 	cp hooks/* .git/hooks
 
 quick-xref:
-	$(REBAR) xref skip_deps=true -r
+	$(REBAR) xref
 
 quick-test:
-	$(REBAR) skip_deps=true eunit -r
+	$(REBAR) eunit
 
 version:
 	git describe > howl.version
 
 version_header: version
-	echo "-define(VERSION, <<\"$(shell cat howl.version)\">>)." > apps/howl/include/howl_version.hrl
+	@echo "-define(VERSION, <<\"$(shell cat howl.version)\">>)." > apps/howl/include/howl_version.hrl
 
 compile: version_header
-	$(REBAR) compile -r
-
-deps:
-	$(REBAR) get-deps -r
+	$(REBAR) compile
 
 clean:
 	$(REBAR) clean -r
 	make -C rel/pkg clean
 
-distclean: clean devclean relclean
-	$(REBAR) delete-deps
+test: xref
+	$(REBAR) eunit
 
-test: all xref
-	$(REBAR) skip_deps=true eunit
+update:
+	$(REBAR) update
 
-rel: all zabbix
-	-rm -r rel/howl/share 2> /dev/null || true
-	$(REBAR) generate
+rel: update compile
+	$(REBAR) as prod compile
+	sh generate_zabbix_template.sh
+	$(REBAR) as prod release
 
 relclean:
 	-rm -rf rel/howl 2> /dev/null || true
-
-devrel: dev1 dev2 dev3 dev4
 
 package: rel
 	make -C rel/pkg package
 
 zabbix:
 	sh generate_zabbix_template.sh
+
 ###
 ### Docs
 ###
 docs:
-	$(REBAR) skip_deps=true doc
+	$(REBAR) doc
 
 ##
 ## Developer targets
@@ -111,3 +108,9 @@ cleanplt:
 	@echo
 	sleep 5
 	rm $(COMBO_PLT)
+
+tree:
+	rebar3 tree | grep -v '=' | sed 's/ (.*//' > tree
+
+tree-diff: tree
+	git diff test -- tree

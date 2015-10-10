@@ -11,81 +11,154 @@
               websocket_info/3, websocket_terminate/3]).
 -ignore_xref([init/3, handle/2, terminate/2]).
 
--record(state, {token, encoder, decoder, type, channels=[]}).
+-record(wsstate, {token :: undefined | binary() | {token, binary()},
+                  encoder :: fun((term()) -> binary()),
+                  decoder :: fun((binary()) -> term()),
+                  type = text :: text | binary,
+                  channels=[],
+                  scope_perms = [[<<"...">>]]}).
+
+-type state() :: #wsstate{}.
 
 init({_Andy, http}, _Req, _Opts) ->
     {upgrade, protocol, cowboy_websocket}.
 
-websocket_init(_Any, Req, []) ->
-    {ok, [C|_], Req0} =
-        cowboy_req:parse_header(
-          <<"sec-websocket-protocol">>,
-          Req, [<<"json">>]),
-    Req1 = cowboy_req:compact(Req0),
-    {Encoder, Decoder, Type, Req2} =
-        case C of
-            <<"msgpack">> ->
-                ReqX = cowboy_req:set_resp_header(
-                         <<"sec-websocket-protocol">>, C,  Req1),
-                {fun(O) ->
+
+init_state(C = <<"msgpack">>, Req) ->
+    Req1 = cowboy_req:set_resp_header(
+             <<"sec-websocket-protocol">>, C,  Req),
+    {#wsstate{
+        encoder =fun(O) ->
                          msgpack:pack(O, [jsx])
                  end,
-                 fun(D) ->
-                         case msgpack:unpack(D, [jsx]) of
-                             {ok, O} ->
-                                 jsxd:from_list(O);
-                             _ ->
-                                 []
-                         end
-                 end,
-                 binary, ReqX};
-            <<"json">> ->
-                ReqX = cowboy_req:set_resp_header(
-                         <<"sec-websocket-protocol">>, C,  Req1),
-                {fun(O) ->
-                         jsx:encode(O)
-                 end,
-                 fun(D) ->
-                         jsxd:from_list(jsx:decode(D))
-                 end, text, ReqX};
-            <<>> ->
-                {fun(O) ->
-                         jsx:encode(O)
-                 end,
-                 fun(D) ->
-                         jsxd:from_list(jsx:decode(D))
-                 end, text, Req0}
+        decoder = fun(D) ->
+                          case msgpack:unpack(D, [jsx]) of
+                              {ok, O} ->
+                                  jsxd:from_list(O);
+                              _ ->
+                                  []
+                          end
+                  end,
+        type = binary},
+     Req1};
+init_state(C = <<"json">>, Req) ->
+    Req1 = cowboy_req:set_resp_header(
+             <<"sec-websocket-protocol">>, C,  Req),
+    {#wsstate{
+        encoder =
+            fun(O) ->
+                    jsx:encode(O)
+            end,
+        decoder =
+            fun(D) ->
+                    jsxd:from_list(jsx:decode(D))
+            end},
+     Req1};
+init_state(unset, Req) ->
+    {#wsstate{
+        encoder =
+            fun(O) ->
+                    jsx:encode(O)
+            end,
+        decoder =
+            fun(D) ->
+                    jsxd:from_list(jsx:decode(D))
+            end},
+     Req}.
+-spec get_ott(Req) ->
+                     {binary(), Req} |
+                     {undefined, Req}
+                         when Req :: cowboy_req:req().
+get_ott(Req) ->
+    cowboy_req:qs_val(<<"fifo_ott">>, Req).
 
-        end,
-    case cowboy_req:header(<<"x-snarl-token">>, Req2) of
-        {<<Token:36/binary>>, Req3} ->
-            {ok, Req3, #state{encoder = Encoder, decoder = Decoder,
-                              type = Type, token = {token, Token}}};
-        {_, Req3} ->
-            case cowboy_req:cookie(<<"x-snarl-token">>, Req3) of
-                {<<Token:36/binary>>, Req4} ->
-                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
-                                      type = Type, token = {token, Token}}};
+%% Fuck you dialyzer, it refuses to accept that get_token can
+%% return stuff other then no_token ...
+-dialyzer({nowarn_function, [get_token/2]}).
+-spec get_token(State, Req) ->
+                       {ok, Req, State} |
+                       {denied, Req, State} |
+                       {no_token, Req, State}
+                           when Req :: cowboy_req:req(),
+                                State :: state().
+get_token(State, Req) ->
+    case get_ott(Req) of
+        {OTT, Req1} when is_binary(OTT) ->
+            case ls_token:get(OTT) of
+                {ok, Bearer} ->
+                    ls_token:delete(OTT),
+                    case ls_oauth:verify_access_token(Bearer) of
+                        {ok, Context} ->
+                            case {proplists:get_value(<<"resource_owner">>, Context),
+                                  proplists:get_value(<<"scope">>, Context)} of
+                                {undefined, _} ->
+                                    {denied, Req1, State};
+                                {UUID, Scope} ->
+                                    {ok, Scopes} = ls_oauth:scope(Scope),
+                                    SPerms = cowboy_oauth:scope_perms(Scopes, []),
+                                    State1 = State#wsstate{token = UUID, scope_perms = SPerms},
+                                    {ok, Req1, State1}
+                            end;
+                        _ ->
+                            {denied, Req1, State}
+                    end;
+                _ ->
+                    {denied, Req1, State}
+            end;
+        {undefined, Req1} ->
+            {no_token, Req1, State}
+    end.
+
+%% Fuck you dialyzer, it refuses to accept that get_token can
+%% return stuff other then no_token ...
+-dialyzer({[no_match], [websocket_init/3]}).
+-spec websocket_init(term(), cowboy_req:req(), []) ->
+                            {ok, cowboy_req:req(), state()} |
+                            {shutdown, cowboy_req:req()}.
+websocket_init(_Any, Req, []) ->
+    {ok, [C|_], Req1} =
+        cowboy_req:parse_header(
+          <<"sec-websocket-protocol">>,
+          Req, [unset]),
+    {State, Req2} = init_state(C, Req1),
+    case get_token(State, Req2) of
+        {ok, Req3, State1} ->
+            {ok, Req3, State1};
+        {denied, Req3, _State1} ->
+            {ok, Req4} = cowboy_req:reply(403, [], <<"permission denied">>,
+                                          Req3),
+            {shutdown, Req4};
+        {no_token, Req3, State1} ->
+            case cowboy_req:binding(version, Req3) of
+                {<<"0.1.0">>, Req4} ->
+                    {ok, Req4, State1};
                 {_, Req4} ->
-                    {ok, Req4, #state{encoder = Encoder, decoder = Decoder,
-                                      type = Type}}
+                    {ok, Req5} = cowboy_req:reply(401, [], <<"ott required">>,
+                                                  Req4),
+                    {shutdown, Req5}
             end
     end.
 
+
 websocket_handle({Type, Raw}, Req,
-                 State = #state{type = Type, decoder = Dec}) ->
-    handle_data(Dec(Raw), Req, State);
+                 State = #wsstate{type = Type, decoder = Dec, encoder = Enc}) ->
+    case handle_data(Dec(Raw), State) of
+        {reply, Reply, State1} ->
+            {reply, {Type, Enc(Reply)}, Req, State1};
+        {ok, State1} ->
+            {ok, Req, State1}
+    end;
 
 websocket_handle(_Any, Req, State) ->
     {ok, Req, State}.
 
-websocket_info({msg, Msg}, Req, State = #state{type = Type, encoder = Enc}) ->
+websocket_info({msg, Msg}, Req, State = #wsstate{type = Type, encoder = Enc}) ->
     {reply, {Type, Enc(Msg)}, Req, State};
 
 websocket_info(_Info, Req, State) ->
     {ok, Req, State}.
 
-websocket_terminate(normal, _Req, #state{channels = Cs}) ->
+websocket_terminate(normal, _Req, #wsstate{channels = Cs}) ->
     [howl:leave(C) || C <- Cs],
     ok;
 
@@ -94,56 +167,51 @@ websocket_terminate(Reason, _Req, State) ->
                   [Reason, State]),
     ok.
 
-handle_data([{<<"ping">>, V}], Req,
-            State = #state{type = Type, encoder = Enc}) ->
-    {reply, {Type, Enc([{<<"pong">>, V}])}, Req, State};
+handle_data([{<<"ping">>, V}], State) ->
+    {reply, [{<<"pong">>, V}], State};
 
-handle_data([{<<"token">>, <<Token:36/binary>>}], Req,
-            State = #state{type = Type, encoder = Enc}) ->
-    {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req,
-     State#state{token = {token, Token}}};
+handle_data([{<<"token">>, Token}], State) ->
+    State1 = State#wsstate{token = {token, Token}},
+    {reply, [{<<"ok">>, <<"authenticated">>}], State1};
 
-handle_data([{<<"token">>, _}], Req,
-            State = #state{type = Type, encoder = Enc}) ->
-    {reply, {Type, Enc([{<<"error">>, <<"invalid token">>}])}, Req,
-     State};
-
-handle_data([{<<"auth">>, Auth}], Req,
-            State = #state{type = Type, encoder = Enc}) ->
-    {ok, User} = jsxd:get([<<"user">>], Auth),
-    {ok, Pass} = jsxd:get([<<"pass">>], Auth),
-    case libsnarl:auth(User, Pass) of
-        {ok, Token} ->
-            {reply, {Type, Enc([{<<"ok">>, <<"authenticated">>}])}, Req,
-             State#state{token =  Token}};
+handle_data([{<<"bearer">>, Bearer}], State) ->
+    case ls_oauth:verify_access_token(Bearer) of
+        {ok, Context} ->
+            case {proplists:get_value(<<"resource_owner">>, Context),
+                  proplists:get_value(<<"scope">>, Context)} of
+                {undefined, _} ->
+                    {reply, [{<<"error">>, <<"access_denied">>}], State};
+                {UUID, Scope} ->
+                    SPerms = cowboy_oauth:scope_perms(ls_oauth:scope(Scope), []),
+                    State1 = State#wsstate{token = UUID, scope_perms = SPerms},
+                    {reply, [{<<"ok">>, <<"authenticated">>}], State1}
+            end;
         _ ->
-            {reply, {Type, Enc([{<<"error">>, <<"authentication failed">>}])},
-             Req, State}
+            {reply, [{<<"error">>, <<"access_denied">>}], State}
     end;
 
-handle_data(_, Req, State = #state{type = Type,
-                                   encoder = Enc, token = undefined}) ->
-    {reply, {Type, Enc([{<<"error">>, <<"not authenticated">>}])}, Req, State};
+handle_data(_, State = #wsstate{token = undefined}) ->
+    {reply, [{<<"error">>, <<"not authenticated">>}], State};
 
-handle_data([{<<"join">>, Channel}], Req,
-            State = #state{token = Token, type = Type, encoder = Enc,
-                           channels=Cs}) ->
-    case libsnarl:allowed(Token, [<<"channels">>, Channel, <<"join">>]) of
+handle_data([{<<"join">>, Channel}],
+            State = #wsstate{token = Token, channels=Cs, scope_perms = SP}) ->
+    Permission = [<<"channels">>, Channel, <<"join">>],
+    case libsnarlmatch:test_perms(Permission, SP) andalso
+        libsnarl:allowed(Token, Permission) of
         true ->
             howl:listen(Channel),
-            {reply, {Type, Enc([{<<"ok">>, <<"channel joined">>}])},
-             Req, State#state{channels=[Channel | Cs]}};
+            State1 = State#wsstate{channels=[Channel | Cs]},
+            {reply, [{<<"ok">>, <<"channel joined">>}], State1};
         _ ->
-            {reply, {Type, Enc([{<<"error">>, <<"permission denied">>}])},
-             Req, State}
+            {reply, [{<<"error">>, <<"permission denied">>}], State}
     end;
 
 
-handle_data([{<<"leave">>, Channel}], Req,
-            State = #state{type = Type, encoder = Enc, channels=Cs}) ->
+handle_data([{<<"leave">>, Channel}],
+            State = #wsstate{channels=Cs}) ->
     howl:leave(Channel),
-    {reply, {Type, Enc([{<<"ok">>, <<"channel left">>}])}, Req,
-     State#state{channels=[C || C <- Cs, C =/= Channel]}};
+    State1 = State#wsstate{channels=[C || C <- Cs, C =/= Channel]},
+    {reply, [{<<"ok">>, <<"channel left">>}], State1};
 
-handle_data(_JSON, Req, State) ->
-    {ok, Req, State}.
+handle_data(_JSON, State) ->
+    {ok, State}.

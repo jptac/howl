@@ -105,7 +105,7 @@ unique(Objs) ->
 %%
 %% @doc Given a `Val' update the `Obj'.  The `Updater' is the name of
 %% the entity performing the update.
--spec update(val(), node(), howl_obj()) -> howl_obj().
+-spec update(val(), node(), #howl_obj{}) -> #howl_obj{}.
 update(Val, Updater, #howl_obj{vclock=VClock0}=Obj0) ->
     VClock = vclock:increment(Updater, VClock0),
     Obj0#howl_obj{val=Val, vclock=VClock}.

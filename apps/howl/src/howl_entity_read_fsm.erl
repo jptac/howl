@@ -27,7 +27,6 @@
                 preflist,
                 num_r=0,
                 size,
-                start,
                 timeout=?DEFAULT_TIMEOUT,
                 val,
                 vnode,
@@ -107,7 +106,6 @@ init([ReqId, {VNode, System}, Op, From, Entity, Val]) ->
                 from=From,
                 op=Op,
                 val=Val,
-                start = now(),
                 vnode=VNode,
                 system=System,
                 entity=Entity},
@@ -283,7 +281,7 @@ unique(L) ->
     sets:to_list(sets:from_list(L)).
 
 mk_reqid() ->
-    erlang:phash2(erlang:now()).
+    erlang:unique_integer().
 
 %% @doc Remote call to determine if process is alive or not; assume if
 %%      the node fails communication it is, since we have no proof it

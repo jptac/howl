@@ -26,6 +26,5 @@ message({msg, Msgs}, State) ->
 message(version, State) ->
     {reply, {ok, ?VERSION}, State};
 
-message(Oops, State) ->
-    io:format("oops: ~p~n", [Oops]),
+message(_Oops, State) ->
     {stop, State}.

@@ -1,19 +1,20 @@
-VERSION=0.6.1p1
+VERSION=0.7.0
 COMPONENT_INTERNAL=howl
 COMPONENT=fifo-howl
+DEPS="erlang>=16.1.2" "coreutils>=8.22nb1" "sudo>=1.7.10p9"
+DEPS="erlang" "coreutils" "sudo" "grep"
 
-.PHONY: build_info package package_list
+include ../../_build/prod/lib/fifo_utils/priv/pkg.mk
 
-package_list:
-	echo "@pkgdep erlang>=15.1.1" > packlist
-	(cd ../$(COMPONENT_INTERNAL); find * -type f | sort) >> packlist
-build_info:
-	pkg_info -X pkg_install | egrep '^(MACHINE_ARCH|OPSYS|OS_VERSION|PKGTOOLS_VERSION)' >build-info
-	echo "CATEGORIES=fifo" >>build-info
-	echo "HOMEPAGE=http://project-fifo.net/" >>build-info
+.PHONY: prepare
 
-clean:
-	-rm *.tgz build-info packlist 2> /dev/null || true
+prepare:
+	-rm -r $(STAGE_DIR)/$(COMPONENT)
+	cp -r ../../_build/prod/rel/$(COMPONENT_INTERNAL) $(STAGE_DIR)/$(COMPONENT)
 
-package: package_list build_info
-	pkg_create -i install.sh -k deinstall.sh -D displayfile -B build-info -c comment -d description -f packlist -I /opt/local/$(COMPONENT) -p ../$(COMPONENT_INTERNAL) -U $(COMPONENT)-$(VERSION)$(SUFFIX).tgz
+
+package: prepare $(FILE).tgz
+
+clean: clean-pkg
+	-rm *.tgz
+
