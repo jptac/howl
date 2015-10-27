@@ -44,7 +44,7 @@
 │  │  └─ setup─1.4
 │  ├─ pbkdf2─2.0.0
 │  └─ riak_sysmon─2.0.0
-├─ riak_ensemble─2.0.0
+├─ riak_ensemble─2.1.2
 └─ wiggle─0.7.0
    ├─ cowboy_oauth─0.2.11
    │  ├─ erlydtl─0.9.2+build.760.ref5ac24d1
