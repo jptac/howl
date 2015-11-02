@@ -4,7 +4,7 @@
 ├─ cuttlefish─2.0.0+build.479.reff5f6fdc
 │  ├─ getopt─0.4.3
 │  └─ neotoma─1.7.2
-├─ edown─0.7+build.147.refc770057
+├─ edown─0.7+build.149.refb012490
 ├─ eper─0.94.0
 ├─ fifo_lager─0.1.0
 │  ├─ lager_graylog─1
@@ -54,9 +54,10 @@
    │  ├─ dflow─0.1.5
    │  └─ qdate─0.3.0-pre
    │     ├─ erlang_localtime─1.0
-   │     └─ erlware_commons─0.16.0
+   │     └─ erlware_commons─0.16.1
+   │        └─ cf─0.2.1
    ├─ e2qc─1.0
-   ├─ fifo_dt─0.1.55
+   ├─ fifo_dt─0.1.56
    │  └─ riak_dt─2.1.1
    ├─ fifo_s3─0.1.13
    │  ├─ base16─1.0
