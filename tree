@@ -57,13 +57,13 @@
    │     └─ erlware_commons─0.16.1
    │        └─ cf─0.2.1
    ├─ e2qc─1.0
-   ├─ fifo_dt─0.1.56
+   ├─ fifo_dt─0.1.57
    │  └─ riak_dt─2.1.1
    ├─ fifo_s3─0.1.13
    │  ├─ base16─1.0
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5
    ├─ libchunter─0.1.40
-   ├─ libsniffle─0.3.30
+   ├─ libsniffle─0.3.31
    ├─ meck─0.8.2
    └─ uuid─0.4.7
