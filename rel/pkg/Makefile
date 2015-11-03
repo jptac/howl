@@ -1,7 +1,7 @@
-VERSION=0.7.0
+VERSION=0.7.0p1
 COMPONENT_INTERNAL=howl
 COMPONENT=fifo-howl
-DEPS="erlang>=16.1.2" "coreutils>=8.22nb1" "sudo>=1.7.10p9"
+#DEPS="erlang>=16.1.2" "coreutils>=8.22nb1" "sudo>=1.7.10p9"
 DEPS="erlang" "coreutils" "sudo" "grep"
 
 include ../../_build/prod/lib/fifo_utils/priv/pkg.mk
