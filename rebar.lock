@@ -125,7 +125,7 @@
  {<<"lager_watchdog">>,{pkg,<<"lager_watchdog">>,<<"0.1.10">>},1},
  {<<"libchunter">>,
   {git,"https://github.com/project-fifo/libchunter.git",
-       {ref,"62336bc21b90f2a39aff960215c99c872603c4ed"}},
+       {ref,"756418e0f5000b7299be6459aaa4ff5e71525ed0"}},
   1},
  {<<"libsnarl">>,
   {git,"https://github.com/project-fifo/libsnarl.git",
@@ -209,5 +209,5 @@
   1},
  {<<"wiggle">>,
   {git,"http://github.com/project-fifo/wiggle-app.git",
-       {ref,"1becd2e893acc84596cca8b8ae9ca3b8c1c6fa79"}},
+       {ref,"f315e7a860eba87df6bd307dcf24bd82dfe7865b"}},
   0}].
