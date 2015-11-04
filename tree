@@ -1,4 +1,5 @@
-[0m├─ clique─0.3.1+build.140.ref8067df5
+[0m├─ bugsnag─0.0.0+build.22.refc07ccb0
+├─ clique─0.3.1+build.140.ref8067df5
 ├─ cowboy─1.0.2
 │  └─ cowlib─1.0.1
 ├─ cuttlefish─2.0.0+build.479.reff5f6fdc
@@ -54,7 +55,7 @@
    │  ├─ dflow─0.1.5
    │  └─ qdate─0.3.0-pre
    │     ├─ erlang_localtime─1.0
-   │     └─ erlware_commons─0.16.1
+   │     └─ erlware_commons─0.18.0
    │        └─ cf─0.2.1
    ├─ e2qc─1.0
    ├─ fifo_dt─0.1.57
