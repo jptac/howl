@@ -21,6 +21,7 @@
                   fifo_utils,
                   fifo_spec,
                   wiggle,
+                  bugsnag,
                   mnesia
                  ]},
   {mod, { howl_app, []}},
