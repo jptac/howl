@@ -55,7 +55,6 @@ start(_StartType, _StartArgs) ->
     case howl_sup:start_link() of
         {ok, Pid} ->
             spawn(fun delay_mdns_anouncement/0),
-            lager_watchdog_srv:set_version(?VERSION),
             ok = riak_core:register([{vnode_module, howl_vnode}]),
             ok = riak_core_ring_events:add_guarded_handler(howl_ring_event_handler, []),
             ok = riak_core_node_watcher_events:add_guarded_handler(howl_node_event_handler, []),
