@@ -1,7 +1,7 @@
 [0m├─ bugsnag─0.0.0+build.23.ref636626c
 ├─ clique─0.3.1+build.140.ref8067df5
 ├─ cowboy─1.0.2
-│  └─ cowlib─1.0.1
+│  └─ cowlib─1.0.2
 ├─ cuttlefish─2.0.0+build.479.reff5f6fdc
 │  ├─ getopt─0.4.3
 │  └─ neotoma─1.7.2
@@ -27,10 +27,9 @@
 │  │  ├─ mdns_client─0.1.7
 │  │  └─ pooler─1.4.0
 │  └─ oauth2─0.6.0
-├─ mdns_server_lib─0.2.0
+├─ mdns_server_lib─0.2.1
 │  └─ mdns_server─0.2.0
 ├─ msgpack─0.3.3
-├─ poolboy─1.5.1
 ├─ ranch─1.1.0p1
 ├─ recon─2.2.1
 ├─ riak_core─fifo-0.4.4+build.1799.ref088de5d
@@ -43,12 +42,13 @@
 │  │  ├─ parse_trans─2.9
 │  │  └─ setup─1.4
 │  ├─ pbkdf2─2.0.0
+│  ├─ poolboy─0.8.1p3
 │  └─ riak_sysmon─2.0.0
 ├─ riak_ensemble─2.1.2
 └─ wiggle─0.7.1
    ├─ cowboy_oauth─0.2.11
    │  ├─ erlydtl─0.9.2+build.760.ref5ac24d1
-   │  │  └─ eunit_formatters─0.1.2+build.37.ref35e3e6a
+   │  │  └─ eunit_formatters─v0.3.1+build.39.refdd1c7fd
    │  └─ merl─1
    ├─ dqe─0.1.23
    │  ├─ dflow─0.1.5
