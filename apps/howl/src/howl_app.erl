@@ -37,18 +37,6 @@ start(_StartType, _StartArgs) ->
                                           {keyfile, SSLKey}],
                                          [{compress, Compression},
                                           {env, [{dispatch, Dispatch}]}]);
-        {ok, spdy} ->
-            {ok, SSLPort} = application:get_env(howl, ssl_port),
-            {ok, SSLCA} = application:get_env(howl, ssl_cacertfile),
-            {ok, SSLCert} = application:get_env(howl, ssl_certfile),
-            {ok, SSLKey} = application:get_env(howl, ssl_keyfile),
-            {ok, _} = cowboy:start_spdy(spdy, Acceptors,
-                                        [{port, SSLPort},
-                                         {cacertfile, SSLCA},
-                                         {certfile, SSLCert},
-                                         {keyfile, SSLKey}],
-                                        [{compress, Compression},
-                                         {env, [{dispatch, Dispatch}]}]);
         _ ->
             ok
     end,
@@ -56,8 +44,10 @@ start(_StartType, _StartArgs) ->
         {ok, Pid} ->
             spawn(fun delay_mdns_anouncement/0),
             ok = riak_core:register([{vnode_module, howl_vnode}]),
-            ok = riak_core_ring_events:add_guarded_handler(howl_ring_event_handler, []),
-            ok = riak_core_node_watcher_events:add_guarded_handler(howl_node_event_handler, []),
+            ok = riak_core_ring_events:add_guarded_handler(
+                   howl_ring_event_handler, []),
+            ok = riak_core_node_watcher_events:add_guarded_handler(
+                   howl_node_event_handler, []),
             ok = riak_core_node_watcher:service_up(howl, self()),
             howl_snmp_handler:start(),
             {ok, Pid};

@@ -13,8 +13,6 @@
 -record(howl_obj, {val    :: val(),
 		    vclock :: vclock:vclock()}).
 
--type howl_obj() :: #howl_obj{} | not_found.
-
 -type idx_node() :: {integer(), node()}.
 
--type vnode_reply() :: {idx_node(), howl_obj() | not_found}.
+-type vnode_reply() :: {idx_node(), howl_obj:maybe_howl_obj()}.

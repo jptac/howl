@@ -30,7 +30,8 @@ init(_Args) ->
 
     CoverageFSMs = {howl_entity_coverage_fsm_sup,
                     {howl_entity_coverage_fsm_sup, start_link, []},
-                    permanent, infinity, supervisor, [howl_entity_coverage_fsm_sup]},
+                    permanent, infinity, supervisor,
+                    [howl_entity_coverage_fsm_sup]},
 
     ReadFSMs = {howl_entity_read_fsm_sup,
                 {howl_entity_read_fsm_sup, start_link, []},
