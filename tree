@@ -23,11 +23,11 @@
 ├─ libsnarl─0.3.34
 │  ├─ fifo_spec─0.1.23
 │  ├─ libsnarlmatch─0.1.7
-│  ├─ mdns_client_lib─0.1.29
+│  ├─ mdns_client_lib─0.1.30
 │  │  ├─ mdns_client─0.1.7
 │  │  └─ pooler─1.4.0
 │  └─ oauth2─0.6.0
-├─ mdns_server_lib─0.2.1
+├─ mdns_server_lib─0.2.2
 │  └─ mdns_server─0.2.0
 ├─ msgpack─0.3.3
 ├─ ranch─1.1.0p1
