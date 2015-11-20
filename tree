@@ -5,7 +5,7 @@
 ├─ cuttlefish─2.0.0+build.479.reff5f6fdc
 │  ├─ getopt─0.4.3
 │  └─ neotoma─1.7.2
-├─ edown─0.7+build.149.refb012490
+├─ edown─0.7+build.151.ref2f6d4d4
 ├─ eper─0.94.0
 ├─ fifo_lager─0.1.1
 │  ├─ lager_graylog─1
@@ -23,7 +23,7 @@
 ├─ libsnarl─0.3.34
 │  ├─ fifo_spec─0.1.23
 │  ├─ libsnarlmatch─0.1.7
-│  ├─ mdns_client_lib─0.1.28
+│  ├─ mdns_client_lib─0.1.29
 │  │  ├─ mdns_client─0.1.7
 │  │  └─ pooler─1.4.0
 │  └─ oauth2─0.6.0
