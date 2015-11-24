@@ -65,53 +65,19 @@ init_state(unset, Req) ->
                     jsxd:from_list(jsx:decode(D))
             end},
      Req}.
--spec get_ott(Req) ->
-                     {binary(), Req} |
-                     {undefined, Req}
-                         when Req :: cowboy_req:req().
-get_ott(Req) ->
-    cowboy_req:qs_val(<<"fifo_ott">>, Req).
 
-%% Fuck you dialyzer, it refuses to accept that get_token can
-%% return stuff other then no_token ...
--dialyzer({nowarn_function, [get_token/2]}).
--spec get_token(State, Req) ->
-                       {ok, Req, State} |
-                       {denied, Req, State} |
-                       {no_token, Req, State}
-                           when Req :: cowboy_req:req(),
-                                State :: state().
 get_token(State, Req) ->
-    case get_ott(Req) of
-        {OTT, Req1} when is_binary(OTT) ->
-            case ls_token:get(OTT) of
-                {ok, Bearer} ->
-                    ls_token:delete(OTT),
-                    case ls_oauth:verify_access_token(Bearer) of
-                        {ok, Context} ->
-                            case {proplists:get_value(<<"resource_owner">>, Context),
-                                  proplists:get_value(<<"scope">>, Context)} of
-                                {undefined, _} ->
-                                    {denied, Req1, State};
-                                {UUID, Scope} ->
-                                    {ok, Scopes} = ls_oauth:scope(Scope),
-                                    SPerms = cowboy_oauth:scope_perms(Scopes, []),
-                                    State1 = State#wsstate{token = UUID, scope_perms = SPerms},
-                                    {ok, Req1, State1}
-                            end;
-                        _ ->
-                            {denied, Req1, State}
-                    end;
-                _ ->
-                    {denied, Req1, State}
-            end;
-        {undefined, Req1} ->
-            {no_token, Req1, State}
+    case wiggle_h:get_ws_token(Req) of
+        {ok, Token, SPerms, Req1} ->
+            State1 = State#wsstate{token = Token, scope_perms = SPerms},
+            {ok, Req1, State1};
+        {Error, Req1} ->
+            {Error, Req1, State}
     end.
 
 %% Fuck you dialyzer, it refuses to accept that get_token can
 %% return stuff other then no_token ...
--dialyzer({[no_match], [websocket_init/3]}).
+-dialyzer({[no_match], [get_token/2, websocket_init/3]}).
 -spec websocket_init(term(), cowboy_req:req(), []) ->
                             {ok, cowboy_req:req(), state()} |
                             {shutdown, cowboy_req:req()}.
@@ -128,17 +94,11 @@ websocket_init(_Any, Req, []) ->
             {ok, Req4} = cowboy_req:reply(403, [], <<"permission denied">>,
                                           Req3),
             {shutdown, Req4};
-        {no_token, Req3, State1} ->
-            case cowboy_req:binding(version, Req3) of
-                {<<"0.1.0">>, Req4} ->
-                    {ok, Req4, State1};
-                {_, Req4} ->
-                    {ok, Req5} = cowboy_req:reply(401, [], <<"ott required">>,
-                                                  Req4),
-                    {shutdown, Req5}
-            end
+        {no_token, Req3, _State1} ->
+            {ok, Req4} = cowboy_req:reply(401, [], <<"ott required">>,
+                                          Req3),
+            {shutdown, Req4}
     end.
-
 
 websocket_handle({Type, Raw}, Req,
                  State = #wsstate{type = Type, decoder = Dec, encoder = Enc}) ->
@@ -169,29 +129,6 @@ websocket_terminate(Reason, _Req, State) ->
 
 handle_data([{<<"ping">>, V}], State) ->
     {reply, [{<<"pong">>, V}], State};
-
-handle_data([{<<"token">>, Token}], State) ->
-    State1 = State#wsstate{token = {token, Token}},
-    {reply, [{<<"ok">>, <<"authenticated">>}], State1};
-
-handle_data([{<<"bearer">>, Bearer}], State) ->
-    case ls_oauth:verify_access_token(Bearer) of
-        {ok, Context} ->
-            case {proplists:get_value(<<"resource_owner">>, Context),
-                  proplists:get_value(<<"scope">>, Context)} of
-                {undefined, _} ->
-                    {reply, [{<<"error">>, <<"access_denied">>}], State};
-                {UUID, Scope} ->
-                    SPerms = cowboy_oauth:scope_perms(ls_oauth:scope(Scope), []),
-                    State1 = State#wsstate{token = UUID, scope_perms = SPerms},
-                    {reply, [{<<"ok">>, <<"authenticated">>}], State1}
-            end;
-        _ ->
-            {reply, [{<<"error">>, <<"access_denied">>}], State}
-    end;
-
-handle_data(_, State = #wsstate{token = undefined}) ->
-    {reply, [{<<"error">>, <<"not authenticated">>}], State};
 
 handle_data([{<<"join">>, Channel}],
             State = #wsstate{token = Token, channels=Cs, scope_perms = SP}) ->

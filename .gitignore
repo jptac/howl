@@ -25,4 +25,5 @@ rel/pkg/build-info
 rel/pkg/packlist
 standalone.config
 .rebar
+TEST*
 _build

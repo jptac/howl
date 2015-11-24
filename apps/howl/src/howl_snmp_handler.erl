@@ -16,14 +16,14 @@
 
 %% Internal exports
 
--define(status_col, 4).
+%% -define(status_col, 4).
 
--define(active, 1).
--define(notInService, 2).
--define(notReady, 3).
--define(createAndGo, 4).   % Action; written, not read
--define(createAndWait, 5). % Action; written, not read
--define(destroy, 6).       % Action; written, not read
+%% -define(active, 1).
+%% -define(notInService, 2).
+%% -define(notReady, 3).
+%% -define(createAndGo, 4).   % Action; written, not read
+%% -define(createAndWait, 5). % Action; written, not read
+%% -define(destroy, 6).       % Action; written, not read
 
 
 
