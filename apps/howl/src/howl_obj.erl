@@ -3,11 +3,12 @@
 %%
 %% TODO Possibly move type/record defs in there and use accessor funs
 %% and opaque types.
-%% 
-%% Taken form https://github.com/Licenser/try-try-try/blob/master/2011/riak-core-conflict-resolution/rts/src/rts_obj.erl
+%%
+%% Taken form https://github.com/Licenser/try-try-try/blob/master/2011/
+%% riak-core-conflict-resolution/rts/src/rts_obj.erl
 
 -module(howl_obj).
--export([ancestors/1, children/1, equal/1, equal/2, merge/2, unique/1,
+-export([ancestors/1, children/1, equal/1, equal/2, merge/1, unique/1,
          update/3]).
 -export([val/1, vclock/1]).
 
@@ -20,13 +21,16 @@
 
 -include("howl.hrl").
 
+-type howl_obj() :: #howl_obj{}.
+-type maybe_howl_obj() :: howl_obj() | not_found.
+-export_type([howl_obj/0, maybe_howl_obj/0]).
 
 %% @pure
 %%
 %% @doc Given a list of `howl_obj()' return a list of all the
 %% ancestors.  Ancestors are objects that all the other objects in the
 %% list have descent from.
--spec ancestors([howl_obj()]) -> [howl_obj()].
+-spec ancestors([maybe_howl_obj()]) -> [howl_obj()].
 ancestors(Objs0) ->
     Objs = [O || O <- Objs0, O /= not_found],
     As = [[O2 || O2 <- Objs,
@@ -51,8 +55,8 @@ children(Objs) ->
 %% @pure
 %%
 %% @doc Predeicate to determine if `ObjA' and `ObjB' are equal.
--spec equal(ObjA::howl_obj(), ObjB::howl_obj()) -> boolean().
-equal(#howl_obj{vclock=A}, #howl_obj{vclock=B}) -> vclock:equal(A,B);
+-spec equal(ObjA::maybe_howl_obj(), ObjB::maybe_howl_obj()) -> boolean().
+equal(#howl_obj{vclock=A}, #howl_obj{vclock=B}) -> vclock:equal(A, B);
 equal(not_found, not_found) -> true;
 equal(_, _) -> false.
 
@@ -60,7 +64,8 @@ equal(_, _) -> false.
 %%
 %% @doc Closure around `equal/2' for use with HOFs (damn verbose
 %% Erlang).
--spec equal(ObjA::howl_obj()) -> fun((ObjB::howl_obj()) -> boolean()).
+-spec equal(ObjA::maybe_howl_obj()) ->
+                   fun((ObjB::maybe_howl_obj()) -> boolean()).
 equal(ObjA) ->
     fun(ObjB) -> equal(ObjA, ObjB) end.
 
@@ -68,20 +73,20 @@ equal(ObjA) ->
 %%
 %% @doc Merge the list of `Objs', calling the appropriate reconcile
 %% fun if there are siblings.
--spec merge(atom(),[howl_obj()]) -> howl_obj().
-merge(FSM, [not_found|_]=Objs) ->
+-spec merge([maybe_howl_obj()]) -> maybe_howl_obj().
+merge([not_found|_]=Objs) ->
     P = fun(X) -> X == not_found end,
     case lists:all(P, Objs) of
         true -> not_found;
-        false -> merge(FSM, lists:dropwhile(P, Objs))
+        false -> merge(lists:dropwhile(P, Objs))
     end;
 
-merge(FSM, [#howl_obj{}|_]=Objs) ->
+merge([#howl_obj{}|_]=Objs) ->
     case howl_obj:children(Objs) of
         [] -> not_found;
         [Child] -> Child;
         Chldrn ->
-            Val = FSM:reconcile(lists:map(fun val/1, Chldrn)),
+            Val = howl_entity_read_fsm:reconcile(lists:map(fun val/1, Chldrn)),
             MergedVC = vclock:merge(lists:map(fun vclock/1, Chldrn)),
             #howl_obj{val=Val, vclock=MergedVC}
     end.
@@ -89,7 +94,7 @@ merge(FSM, [#howl_obj{}|_]=Objs) ->
 %% @pure
 %%
 %% @doc Given a list of `Objs' return the list of uniques.
--spec unique([howl_obj()]) -> [howl_obj()].
+-spec unique([maybe_howl_obj()]) -> [maybe_howl_obj()].
 unique(Objs) ->
     F = fun(not_found, Acc) ->
                 Acc;
@@ -105,7 +110,7 @@ unique(Objs) ->
 %%
 %% @doc Given a `Val' update the `Obj'.  The `Updater' is the name of
 %% the entity performing the update.
--spec update(val(), node(), #howl_obj{}) -> #howl_obj{}.
+-spec update(val(), node(), howl_obj()) -> howl_obj().
 update(Val, Updater, #howl_obj{vclock=VClock0}=Obj0) ->
     VClock = vclock:increment(Updater, VClock0),
     Obj0#howl_obj{val=Val, vclock=VClock}.

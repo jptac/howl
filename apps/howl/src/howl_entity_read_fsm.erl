@@ -27,11 +27,13 @@
                 preflist,
                 num_r=0,
                 size,
-                timeout=?DEFAULT_TIMEOUT,
+                timeout=10000,
                 val,
                 vnode,
                 system,
                 replies=[]}).
+-type state() :: #state{}.
+-export_type([state/0]).
 
 -ignore_xref([
               code_change/4,
@@ -60,7 +62,8 @@
 %%%===================================================================
 
 start_link(ReqID, {VNode, System}, Op, From, Entity, Val) ->
-    gen_fsm:start_link(?MODULE, [ReqID, {VNode, System}, Op, From, Entity, Val], []).
+    gen_fsm:start_link(?MODULE, [ReqID, {VNode, System}, Op, From, Entity, Val],
+                       []).
 
 start(VNodeInfo, Op) ->
     start(VNodeInfo, Op, undefined).
@@ -127,18 +130,17 @@ execute(timeout, SD0=#state{req_id=ReqId,
                             entity=Entity,
                             op=Op,
                             val=Val,
-                            vnode=VNode,
                             preflist=Prelist}) ->
     case Entity of
         undefined ->
-            VNode:Op(Prelist, ReqId);
+            howl_vnode:Op(Prelist, ReqId);
         _ ->
             case Val of
                 undefined ->
-                    VNode:Op(Prelist, ReqId, Entity);
+                    howl_vnode:Op(Prelist, ReqId, Entity);
                 _ ->
 
-                    VNode:Op(Prelist, ReqId, Entity, Val)
+                    howl_vnode:Op(Prelist, ReqId, Entity, Val)
             end
     end,
     {next_state, waiting, SD0}.
@@ -152,9 +154,9 @@ waiting({ok, ReqID, IdxNode, Obj},
                    r=R, n=N, timeout=Timeout}) ->
     NumR = NumR0 + 1,
     Replies = [{IdxNode, Obj}|Replies0],
-    SD = SD0#state{num_r=NumR,replies=Replies},
-    if
-        NumR =:= R ->
+    SD = SD0#state{num_r=NumR, replies=Replies},
+    case NumR of
+        R ->
             case merge(Replies) of
                 not_found ->
                     From ! {ReqID, ok, not_found};
@@ -162,13 +164,13 @@ waiting({ok, ReqID, IdxNode, Obj},
                     Reply = howl_obj:val(Merged),
                     From ! {ReqID, ok, Reply}
             end,
-            if
-                NumR =:= N ->
+            case NumR of
+                N ->
                     {next_state, finalize, SD, 0};
-                true ->
+                _ ->
                     {next_state, wait_for_n, SD, Timeout}
             end;
-        true ->
+_ ->
             {next_state, waiting, SD}
     end.
 
@@ -188,9 +190,9 @@ wait_for_n(timeout, SD) ->
     {stop, timeout, SD}.
 
 finalize(timeout, SD=#state{
-                    vnode=VNode,
-                    replies=Replies,
-                    entity=Entity}) ->
+                        vnode=VNode,
+                        replies=Replies,
+                        entity=Entity}) ->
     MObj = merge(Replies),
     case needs_repair(MObj, Replies) of
         true ->
@@ -201,13 +203,13 @@ finalize(timeout, SD=#state{
     end.
 
 handle_info(_Info, _StateName, StateData) ->
-    {stop,badmsg,StateData}.
+    {stop, badmsg, StateData}.
 
 handle_event(_Event, _StateName, StateData) ->
-    {stop,badmsg,StateData}.
+    {stop, badmsg, StateData}.
 
 handle_sync_event(_Event, _From, _StateName, StateData) ->
-    {stop,badmsg,StateData}.
+    {stop, badmsg, StateData}.
 
 code_change(_OldVsn, StateName, State, _Extra) -> {ok, StateName, State}.
 
@@ -221,10 +223,10 @@ terminate(_Reason, _SN, _SD) ->
 %% @pure
 %%
 %% @doc Given a list of `Replies' return the merged value.
--spec merge([vnode_reply()]) -> howl_obj() | not_found.
+-spec merge([vnode_reply()]) -> howl_obj:maybe_howl_obj() | not_found.
 merge(Replies) ->
-    Objs = [Obj || {_,Obj} <- Replies],
-    howl_obj:merge(howl_entity_read_fsm, Objs).
+    Objs = [Obj || {_, Obj} <- Replies],
+    howl_obj:merge(Objs).
 
 %% @pure
 %%
@@ -247,28 +249,30 @@ purge(Pids) ->
 %% determine if repair is needed.
 -spec needs_repair(any(), [vnode_reply()]) -> boolean().
 needs_repair(MObj, Replies) ->
-    Objs = [Obj || {_,Obj} <- Replies],
+    Objs = [Obj || {_, Obj} <- Replies],
     lists:any(different(MObj), Objs).
 
 %% @pure
-different(A) -> fun(B) -> not howl_obj:equal(A,B) end.
+different(A) -> fun(B) -> not howl_obj:equal(A, B) end.
 
 %% @impure
 %%
 %% @doc Repair any vnodes that do not have the correct object.
--spec repair(atom(), string(), howl_obj(), [vnode_reply()]) -> io.
-repair(_, _, _, []) -> io;
+-spec repair(atom(), string(), howl_obj:maybe_howl_obj(), [vnode_reply()]) ->
+                    ok.
+repair(_, _, _, []) -> ok;
 
-repair(VNode, StatName, MObj, [{IdxNode,Obj}|T]) ->
+repair(VNode, StatName, MObj, [{IdxNode, Obj}|T]) ->
     case howl_obj:equal(MObj, Obj) of
         true ->
             repair(VNode, StatName, MObj, T);
         false ->
             case Obj of
                 not_found ->
-                    VNode:repair(IdxNode, StatName, not_found, MObj);
+                    howl_vnode:repair(IdxNode, StatName, not_found, MObj);
                 _ ->
-                    VNode:repair(IdxNode, StatName, Obj#howl_obj.vclock, MObj)
+                    howl_vnode:repair(IdxNode, StatName, Obj#howl_obj.vclock,
+                                      MObj)
             end,
             repair(VNode, StatName, MObj, T)
     end.
@@ -286,7 +290,8 @@ mk_reqid() ->
 %% @doc Remote call to determine if process is alive or not; assume if
 %%      the node fails communication it is, since we have no proof it
 %%      is not.
-%% From: https://github.com/cmeiklejohn/riak_pg/blob/master/src/riak_pg_members_fsm.erl
+%% From: https://github.com/cmeiklejohn/riak_pg/blob/master/src/
+%% riak_pg_members_fsm.erl
 is_process_alive(Node, Pid) ->
     case rpc:call(Node, erlang, is_process_alive, [Pid]) of
         {badrpc, _} ->

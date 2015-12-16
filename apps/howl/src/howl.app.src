@@ -2,7 +2,7 @@
 {application, howl,
  [
   {description, "Project FiFo's HTTP server."},
-  {vsn, "0.7.0p1"},
+  {vsn, "0.7.1"},
   {registered, []},
   {applications, [
                   kernel,
@@ -21,6 +21,7 @@
                   fifo_utils,
                   fifo_spec,
                   wiggle,
+                  bugsnag,
                   mnesia
                  ]},
   {mod, { howl_app, []}},

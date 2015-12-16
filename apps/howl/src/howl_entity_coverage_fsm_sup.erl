@@ -10,7 +10,7 @@
 -export([init/1]).
 
 -ignore_xref([init/1,
-	      start_link/0]).
+              start_link/0]).
 
 start_read_fsm(Args) ->
     ?PRINT({start_coverage_fsm, Args}),
@@ -21,9 +21,6 @@ start_link() ->
 
 init([]) ->
     ReadFsm = {undefined,
-	       {
-		 howl_entity_coverage_fsm, start_link, []},
-	       temporary, 5000, worker, [howl_entity_coverage_fsm]},
-    {ok, 
-     {
-       {simple_one_for_one, 10, 10}, [ReadFsm]}}.
+               {howl_entity_coverage_fsm, start_link, []},
+               temporary, 5000, worker, [howl_entity_coverage_fsm]},
+    {ok, {{simple_one_for_one, 10, 10}, [ReadFsm]}}.
