@@ -60,7 +60,7 @@
    ├─ fifo_dt─0.1.58
    │  └─ riak_dt─2.1.1
    ├─ fifo_s3─0.1.13
-   │  ├─ base16─1.0
+   │  ├─ base16─0.0.0+build.9.ref1e9dd28
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5
    ├─ libchunter─0.1.42
