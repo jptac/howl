@@ -50,7 +50,7 @@
    │  ├─ erlydtl─0.9.2+build.760.ref5ac24d1
    │  │  └─ eunit_formatters─v0.3.1+build.40.ref6818dc1
    │  └─ merl─1
-   ├─ dqe─0.1.26
+   ├─ dqe─0.1.28
    │  ├─ dflow─0.1.5
    │  └─ qdate─0.3.0-pre
    │     ├─ erlang_localtime─1.0
@@ -59,8 +59,8 @@
    ├─ e2qc─1.0
    ├─ fifo_dt─0.1.58
    │  └─ riak_dt─2.1.1
-   ├─ fifo_s3─0.1.13
-   │  ├─ base16─0.0.0+build.9.ref1e9dd28
+   ├─ fifo_s3─0.1.14
+   │  ├─ base16─1.0.0
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5
    ├─ libchunter─0.1.42
