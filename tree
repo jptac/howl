@@ -45,12 +45,12 @@
 │  ├─ poolboy─0.8.1p3
 │  └─ riak_sysmon─2.0.0
 ├─ riak_ensemble─2.1.2
-└─ wiggle─0.7.1
+└─ wiggle─0.7.1p1
    ├─ cowboy_oauth─0.2.11
    │  ├─ erlydtl─0.9.2+build.760.ref5ac24d1
    │  │  └─ eunit_formatters─v0.3.1+build.40.ref6818dc1
    │  └─ merl─1
-   ├─ dqe─0.1.28
+   ├─ dqe─0.1.29
    │  ├─ dflow─0.1.5
    │  └─ qdate─0.3.0-pre
    │     ├─ erlang_localtime─1.0
