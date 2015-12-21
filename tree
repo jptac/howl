@@ -50,7 +50,7 @@
    │  ├─ erlydtl─0.9.2+build.760.ref5ac24d1
    │  │  └─ eunit_formatters─v0.3.1+build.40.ref6818dc1
    │  └─ merl─1
-   ├─ dqe─0.1.29
+   ├─ dqe─0.1.30
    │  ├─ dflow─0.1.5
    │  └─ qdate─0.3.0-pre
    │     ├─ erlang_localtime─1.0
