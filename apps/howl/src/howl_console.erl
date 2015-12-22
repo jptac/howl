@@ -26,6 +26,6 @@ print_endpoints(Es) ->
               "----------"
               " ---------------~n", []),
     [print_endpoint(E) || E <- Es].
-print_endpoint([{{Hostname, [{port, Port}, {ip, IP}]}, _, Fails}]) ->
+print_endpoint({{Hostname, [{port, Port}, {ip, IP}]}, _, Fails}) ->
     HostPort = <<IP/binary, ":", Port/binary>>,
     io:format("~40s ~-19s ~9b~n", [Hostname, HostPort, Fails]).
