@@ -130,7 +130,7 @@
  {<<"libsnarlmatch">>,{pkg,<<"libsnarlmatch">>,<<"0.1.7">>},1},
  {<<"libsniffle">>,
   {git,"https://github.com/project-fifo/libsniffle.git",
-       {ref,"c6d22fd4538f5526551a12959688307b867323dd"}},
+       {ref,"01cfbec699d43b71543da3e7c151d8672009a544"}},
   1},
  {<<"mdns_client">>,{pkg,<<"mdns_client">>,<<"0.1.7">>},2},
  {<<"mdns_client_lib">>,{pkg,<<"mdns_client_lib">>,<<"0.1.32">>},1},
@@ -208,5 +208,5 @@
   1},
  {<<"wiggle">>,
   {git,"https://github.com/project-fifo/wiggle-app.git",
-       {ref,"fee4ca31117ffb0e47ac77faf43e6250eae7e4c0"}},
+       {ref,"1dd0e7985bf0bb05a961ac83449a85007c4d06de"}},
   0}].
