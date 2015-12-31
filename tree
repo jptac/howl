@@ -5,7 +5,7 @@
 ├─ cuttlefish─2.0.0+build.479.reff5f6fdc
 │  ├─ getopt─0.4.3
 │  └─ neotoma─1.7.2
-├─ edown─0.7+build.151.ref2f6d4d4
+├─ edown─0.7+build.153.refabd9f5b
 ├─ eper─0.94.0
 ├─ fifo_lager─0.1.1
 │  ├─ lager_graylog─1
@@ -20,14 +20,14 @@
 ├─ jsxd─0.1.10
 ├─ lager─2.1.1
 │  └─ goldrush─0.1.7
-├─ libsnarl─0.3.36
+├─ libsnarl─0.3.37
 │  ├─ fifo_spec─0.1.23
 │  ├─ libsnarlmatch─0.1.7
-│  ├─ mdns_client_lib─0.1.30
+│  ├─ mdns_client_lib─0.1.31
 │  │  ├─ mdns_client─0.1.7
 │  │  └─ pooler─1.4.0
 │  └─ oauth2─0.6.0
-├─ mdns_server_lib─0.2.2
+├─ mdns_server_lib─0.2.3
 │  └─ mdns_server─0.2.0
 ├─ msgpack─0.3.3
 ├─ ranch─1.1.0p1
@@ -64,6 +64,6 @@
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5
    ├─ libchunter─0.1.42
-   ├─ libsniffle─0.3.33
+   ├─ libsniffle─0.3.34
    ├─ meck─0.8.2
    └─ uuid─0.4.7
