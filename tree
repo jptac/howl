@@ -20,7 +20,7 @@
 ├─ jsxd─0.1.10
 ├─ lager─2.1.1
 │  └─ goldrush─0.1.7
-├─ libsnarl─0.3.37
+├─ libsnarl─0.3.38
 │  ├─ fifo_spec─0.1.23
 │  ├─ libsnarlmatch─0.1.7
 │  ├─ mdns_client_lib─0.1.33
