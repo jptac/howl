@@ -125,7 +125,7 @@
   1},
  {<<"libsnarl">>,
   {git,"https://github.com/project-fifo/libsnarl.git",
-       {ref,"162d15f546297afe6a316e21ad583d06dfe1632b"}},
+       {ref,"058e443d3809bf446dcba60c762460925791a6f6"}},
   0},
  {<<"libsnarlmatch">>,{pkg,<<"libsnarlmatch">>,<<"0.1.7">>},1},
  {<<"libsniffle">>,
@@ -208,5 +208,5 @@
   1},
  {<<"wiggle">>,
   {git,"https://github.com/project-fifo/wiggle-app.git",
-       {ref,"5805a58299ad05ae39f96a6438d9594f90a1b3cf"}},
+       {ref,"8a0601bf3a588f47bf87075f2d3bff21bd3ea02a"}},
   0}].
