@@ -92,7 +92,7 @@
   1},
  {<<"fifo_utils">>,
   {git,"https://github.com/project-fifo/fifo_utils.git",
-       {ref,"ffc58d2fd893b6d6c95ef45c669ccb723cefca07"}},
+       {ref,"3697a08a4fd876dff88a1289c344215b41e01f54"}},
   0},
  {<<"folsom">>,
   {git,"git://github.com/basho/folsom.git",
@@ -208,5 +208,5 @@
   1},
  {<<"wiggle">>,
   {git,"https://github.com/project-fifo/wiggle-app.git",
-       {ref,"b70c50378c06e97a401b9a4f427ef998e61c4fe7"}},
+       {ref,"358b9c1738079b14ea948df57c05143f03ce1e28"}},
   0}].
