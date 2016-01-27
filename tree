@@ -63,7 +63,7 @@
    │  ├─ base16─1.0.0
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5
-   ├─ libchunter─0.1.42
+   ├─ libchunter─0.1.43
    ├─ libsniffle─0.3.34
    ├─ meck─0.8.2
    └─ uuid─0.4.7

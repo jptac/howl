@@ -118,7 +118,7 @@
   1},
  {<<"libchunter">>,
   {git,"https://github.com/project-fifo/libchunter.git",
-       {ref,"51c27c7ddeb40ab5b77181e69b7096f3b9a3d3af"}},
+       {ref,"bb692896b37f4cd8254c336647168919d98f0169"}},
   1},
  {<<"libsnarl">>,
   {git,"https://github.com/project-fifo/libsnarl.git",
@@ -202,5 +202,5 @@
   1},
  {<<"wiggle">>,
   {git,"https://github.com/project-fifo/wiggle-app.git",
-       {ref,"8bd67d37795bcb16dea4060a5e052ca059570a70"}},
+       {ref,"d282333a81d6290920e0e6be012119b217664c66"}},
   0}].
