@@ -15,12 +15,12 @@
 │  └─ ddb_client─0.1.17
 │     ├─ dproto─0.1.12
 │     └─ mmath─0.1.15
-├─ howl─0.7.2
+├─ howl─0.7.3
 ├─ jsx─1.4.5
 ├─ jsxd─0.1.10
 ├─ lager─2.1.1
 │  └─ goldrush─0.1.7
-├─ libsnarl─0.3.38
+├─ libsnarl─0.3.39
 │  ├─ fifo_spec─0.1.23
 │  ├─ libsnarlmatch─0.1.7
 │  ├─ mdns_client_lib─0.1.33
@@ -45,7 +45,7 @@
 │  ├─ poolboy─0.8.1p3
 │  └─ riak_sysmon─2.0.0
 ├─ riak_ensemble─2.1.2
-└─ wiggle─0.7.2
+└─ wiggle─0.7.3
    ├─ cowboy_oauth─0.2.11
    │  ├─ erlydtl─0.9.2+build.760.ref5ac24d1
    │  │  └─ eunit_formatters─v0.3.1+build.40.ref6818dc1
@@ -63,7 +63,7 @@
    │  ├─ base16─1.0.0
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5
-   ├─ libchunter─0.1.43
+   ├─ libchunter─0.1.44
    ├─ libsniffle─0.3.34
    ├─ meck─0.8.2
    └─ uuid─0.4.7
