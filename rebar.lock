@@ -52,7 +52,7 @@
  {<<"eper">>,{pkg,<<"eper">>,<<"0.94.0">>},0},
  {<<"erlang_localtime">>,
   {git,"git://github.com/choptastic/erlang_localtime.git",
-       {ref,"bd0083ffe6107537a555133c9b94656ca5c854f3"}},
+       {ref,"78276b1f9e59710263bf9ff27090f004b1f8fd56"}},
   3},
  {<<"erlcloud">>,
   {git,"https://github.com/project-fifo/erlcloud",
@@ -202,5 +202,5 @@
   1},
  {<<"wiggle">>,
   {git,"https://github.com/project-fifo/wiggle-app.git",
-       {ref,"bf0ccdeef3d77191ec5394404f9ee20e7f563781"}},
+       {ref,"3f02865fbfbe7581cb9c836de28a1f21b3d1d611"}},
   0}].
