@@ -64,6 +64,6 @@
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5
    ├─ libchunter─0.1.44
-   ├─ libsniffle─0.3.34
+   ├─ libsniffle─0.3.35
    ├─ meck─0.8.2
    └─ uuid─0.4.7
