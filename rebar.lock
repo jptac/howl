@@ -43,7 +43,7 @@
   1},
  {<<"edown">>,
   {git,"https://github.com/uwiger/edown.git",
-       {ref,"abd9f5bbf9265a0a25640a677824386e199e91a6"}},
+       {ref,"d864427506cd93a00712b7c3b9a89d793e7e1600"}},
   0},
  {<<"eleveldb">>,
   {git,"git://github.com/basho/eleveldb.git",
@@ -208,5 +208,5 @@
   1},
  {<<"wiggle">>,
   {git,"https://github.com/project-fifo/wiggle-app.git",
-       {ref,"ad495782e8ac186983481114e10d3871978698bd"}},
+       {ref,"ec90086416e841cd8c7608c1c4f555e78842be78"}},
   0}].
