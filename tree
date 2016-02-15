@@ -2,7 +2,7 @@
 ├─ clique─0.3.1+build.140.ref8067df5
 ├─ cowboy─1.0.2
 │  └─ cowlib─1.0.2
-├─ cuttlefish─2.0.0+build.479.reff5f6fdc
+├─ cuttlefish─2.0.1+build.502.refbd2660f
 │  ├─ getopt─0.4.3
 │  └─ neotoma─1.7.2
 ├─ edown─0.7+build.155.refd864427
@@ -32,7 +32,7 @@
 ├─ msgpack─0.3.3
 ├─ ranch─1.1.0p1
 ├─ recon─2.2.1
-├─ riak_core─fifo-0.4.4+build.1802.reffdf5dd7
+├─ riak_core─fifo-0.4.4+build.1804.ref74d0ee7
 │  ├─ basho_stats─1.0.3
 │  ├─ chash─0.1.1
 │  ├─ eleveldb─2.1.4
@@ -57,13 +57,13 @@
    │     └─ erlware_commons─0.18.0
    │        └─ cf─0.2.1
    ├─ e2qc─1.0
-   ├─ fifo_dt─0.1.61
+   ├─ fifo_dt─0.1.65
    │  └─ riak_dt─2.1.1
    ├─ fifo_s3─0.1.14
    │  ├─ base16─1.0.0
    │  └─ erlcloud─0.8.6
    ├─ jesse─1.1.5
    ├─ libchunter─0.1.44
-   ├─ libsniffle─0.3.35
+   ├─ libsniffle─0.3.36
    ├─ meck─0.8.2
    └─ uuid─0.4.7
