@@ -5,12 +5,14 @@
 ├─ cuttlefish─2.0.1+build.502.refbd2660f
 │  ├─ getopt─0.4.3
 │  └─ neotoma─1.7.2
-├─ edown─0.7+build.155.refd864427
+├─ edown─0.7.0
 ├─ eper─0.94.0
 ├─ fifo_lager─0.1.1
 │  ├─ lager_graylog─1
 │  └─ lager_logstash_backend─0.0.2
-├─ fifo_utils─0.1.19
+├─ fifo_utils─0.1.21
+│  └─ uuid─1.5.1
+│     └─ quickrand─1.5.1
 ├─ folsom_ddb─0.1.20
 │  └─ ddb_client─0.1.17
 │     ├─ dproto─0.1.12
@@ -20,16 +22,16 @@
 ├─ jsxd─0.1.10
 ├─ lager─2.1.1
 │  └─ goldrush─0.1.7
-├─ libsnarl─0.3.39
-│  ├─ fifo_spec─0.1.23
+├─ libsnarl─0.3.40
+│  ├─ fifo_spec─0.1.27
 │  ├─ libsnarlmatch─0.1.7
 │  ├─ mdns_client_lib─0.1.33
 │  │  ├─ mdns_client─0.1.7
 │  │  └─ pooler─1.4.0
-│  └─ oauth2─0.6.0
+│  └─ oauth2─0.6.1
 ├─ mdns_server_lib─0.2.3
 │  └─ mdns_server─0.2.0
-├─ msgpack─0.3.3
+├─ msgpack─0.3.5
 ├─ ranch─1.1.0p1
 ├─ recon─2.2.1
 ├─ riak_core─fifo-0.4.4+build.1804.ref74d0ee7
@@ -38,7 +40,8 @@
 │  ├─ eleveldb─2.1.4
 │  ├─ exometer_core─1.0.0-basho2
 │  │  ├─ folsom─0.7.4p5
-│  │  │  └─ bear─0.1.3p1
+│  │  │  ├─ bear─0.1.3p1
+│  │  │  └─ meck─0.8.2
 │  │  ├─ parse_trans─2.9
 │  │  └─ setup─1.4
 │  ├─ pbkdf2─2.0.0
@@ -46,24 +49,21 @@
 │  └─ riak_sysmon─2.0.0
 ├─ riak_ensemble─2.1.2
 └─ wiggle─0.7.3
-   ├─ cowboy_oauth─0.2.11
-   │  ├─ erlydtl─0.9.2+build.760.ref5ac24d1
-   │  │  └─ eunit_formatters─v0.3.1+build.40.ref6818dc1
-   │  └─ merl─1
-   ├─ dqe─0.1.32
+   ├─ cowboy_oauth─0.2.13
+   │  └─ erlydtl─0.1.9+build.697.refbe50a18
+   ├─ dqe─0.1.33
    │  ├─ dflow─0.1.5
-   │  └─ qdate─0.3.0-pre
-   │     ├─ erlang_localtime─1.0
+   │  └─ qdate─0.4.2
+   │     ├─ erlang_localtime─1.0.0
    │     └─ erlware_commons─0.18.0
    │        └─ cf─0.2.1
-   ├─ e2qc─1.0
-   ├─ fifo_dt─0.1.65
+   ├─ e2qc─0.1.0
+   ├─ fifo_dt─0.1.66
    │  └─ riak_dt─2.1.1
-   ├─ fifo_s3─0.1.14
+   ├─ fifo_s3─0.1.16
    │  ├─ base16─1.0.0
-   │  └─ erlcloud─0.8.6
-   ├─ jesse─1.1.5
-   ├─ libchunter─0.1.44
-   ├─ libsniffle─0.3.36
-   ├─ meck─0.8.2
-   └─ uuid─0.4.7
+   │  └─ erlcloud─0.13.0
+   │     └─ lhttpc─1.3.0
+   ├─ jesse─0.1.3
+   ├─ libchunter─0.1.45
+   └─ libsniffle─0.3.37
