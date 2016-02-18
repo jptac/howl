@@ -49,7 +49,7 @@
 │  └─ riak_sysmon─2.0.0
 ├─ riak_ensemble─2.1.2
 └─ wiggle─0.7.3
-   ├─ cowboy_oauth─0.2.13
+   ├─ cowboy_oauth─0.2.14
    │  └─ erlydtl─0.11.1
    ├─ dqe─0.1.33
    │  ├─ dflow─0.1.5
