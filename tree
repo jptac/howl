@@ -57,7 +57,7 @@
    │     ├─ erlang_localtime─1.0.0
    │     └─ erlware_commons─0.18.0
    │        └─ cf─0.2.1
-   ├─ e2qc─1.0
+   ├─ e2qc─0.1.0
    ├─ fifo_dt─0.1.66
    │  └─ riak_dt─2.1.1
    ├─ fifo_s3─0.1.16
