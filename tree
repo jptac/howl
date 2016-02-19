@@ -2,12 +2,13 @@
 ├─ clique─0.3.1+build.140.ref8067df5
 ├─ cowboy─1.0.2
 │  └─ cowlib─1.0.2
-├─ cuttlefish─2.0.1+build.502.refbd2660f
+├─ cuttlefish─2.0.1
 │  ├─ getopt─0.4.3
 │  └─ neotoma─1.7.2
 ├─ edown─0.7.0
 ├─ eper─0.94.0
-├─ fifo_lager─0.1.2
+├─ fifo_lager─0.1.3
+│  ├─ lager_graylog─0.1.0
 │  └─ lager_logstash_backend─0.1.0
 ├─ fifo_utils─0.1.21
 │  └─ uuid─1.5.1
@@ -33,10 +34,10 @@
 ├─ msgpack─0.3.5
 ├─ ranch─1.1.0p1
 ├─ recon─2.2.1
-├─ riak_core─fifo-0.4.4+build.1804.ref74d0ee7
+├─ riak_core─fifo-0.4.4+build.1808.refeee675e
 │  ├─ basho_stats─1.0.3
 │  ├─ chash─0.1.1
-│  ├─ eleveldb─2.1.4
+│  ├─ eleveldb─2.1.10
 │  ├─ exometer_core─1.0.0-basho2
 │  │  ├─ folsom─0.7.4p5
 │  │  │  ├─ bear─0.1.3p1
