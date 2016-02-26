@@ -39,7 +39,7 @@
  {<<"exometer_core">>,{pkg,<<"exometer_core">>,<<"1.0.0">>},1},
  {<<"fifo_dt">>,
   {git,"https://github.com/project-fifo/fifo_dt.git",
-       {ref,"d9a6addae121e6f9b9ef88c4df1ebd4a1198512e"}},
+       {ref,"57e647de83c0d4b82a43a811054c9c2c170e4a9c"}},
   1},
  {<<"fifo_lager">>,
   {git,"https://github.com/project-fifo/fifo_lager.git",
@@ -115,5 +115,5 @@
  {<<"uuid">>,{pkg,<<"uuid_erl">>,<<"1.5.1">>},1},
  {<<"wiggle">>,
   {git,"https://github.com/project-fifo/wiggle-app.git",
-       {ref,"20689b411ce3804403fd7f2b3f84f63ee3a80551"}},
+       {ref,"0c45e7e9c8cc5253e7d0b6daf983dd01ffd2da30"}},
   0}].
