@@ -10,6 +10,13 @@ CERTDIR="/data/fifo"
 CERTPREFIX="fifo"
 DAYS=3650
 
+fail_if_error() {
+    [ $1 != 0 ] && {
+        unset PASSPHRASE
+        exit 10
+    }
+}
+
 case $2 in
     PRE-INSTALL)
         if grep "^$GROUP:" /etc/group > /dev/null 2>&1
