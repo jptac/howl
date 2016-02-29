@@ -6,7 +6,7 @@ AWK=/usr/bin/awk
 SED=/usr/bin/sed
 
 DOMAIN="project-fifo.net"
-CERTDIR="/var/db/fifo"
+CERTDIR="/data/fifo"
 CERTPREFIX="fifo"
 DAYS=3650
 
@@ -24,15 +24,15 @@ case $2 in
             echo "User already exists, skipping creation."
         else
             echo Creating howl user ...
-            useradd -g $GROUP -d /var/db/howl -s /bin/false $USER
+            useradd -g $GROUP -d /data/howl/db -s /bin/false $USER
             echo "Granting permissions to use low port numbers"
             /usr/sbin/usermod -K defaultpriv=basic,net_privaddr $USER
         fi
         echo Creating directories ...
-        mkdir -p /var/db/howl/ring
-        chown -R howl:howl /var/db/howl
+        mkdir -p /data/howl/db/ring
+        mkdir -p /data/howl/etc
         mkdir -p /var/log/howl/sasl
-        chown -R howl:howl /var/log/howl
+        chown -R howl:howl /data/howl
 
         ## Certificate creation:
         if [ ! -d $CERTDIR ]
@@ -89,12 +89,19 @@ emailAddress=blah@blah.com
             unset PASSPHRASE
         fi
 
+        if [ -d /tmp/snarl ]
+        then
+            chown -R $USER:$GROUP /tmp/snarl/
+        fi
+
         ;;
     POST-INSTALL)
         svccfg import /opt/local/fifo-howl/share/howl.xml
         echo Trying to guess configuration ...
         IP=`ifconfig net0 | grep inet | $AWK '{print $2}'`
-        CONFFILE=/opt/local/fifo-howl/etc/howl.conf
+
+        CONFFILE=/data/howl/etc/howl.conf
+        cp /opt/local/fifo-howl/etc/howl.conf.example ${CONFFILE}.example
 
         if [ ! -f "${CONFFILE}" ]
         then
