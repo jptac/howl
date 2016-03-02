@@ -38,8 +38,8 @@ case $2 in
         echo Creating directories ...
         mkdir -p /data/howl/db/ring
         mkdir -p /data/howl/etc
-        mkdir -p /var/log/howl/sasl
-        chown -R howl:howl /data/howl
+        mkdir -p /data/howl/log/sasl
+        chown -R $USER:$GROUP /data/howl
 
         ## Certificate creation:
         if [ ! -d $CERTDIR ]
@@ -96,9 +96,9 @@ emailAddress=blah@blah.com
             unset PASSPHRASE
         fi
 
-        if [ -d /tmp/snarl ]
+        if [ -d /tmp/howl ]
         then
-            chown -R $USER:$GROUP /tmp/snarl/
+            chown -R $USER:$GROUP /tmp/howl/
         fi
 
         ;;
