@@ -9,12 +9,17 @@ connections(["snarl"]) ->
     print_endpoints(libsnarl:servers());
 
 connections(["sniffle"]) ->
-    io:format("Snarl endpoints.~n"),
+    io:format("Sniffle endpoints.~n"),
     print_endpoints(libsniffle:servers());
 
 connections([]) ->
-    connections(["snarl"]),
-    connections(["sniffle"]).
+    case {connections(["snarl"]),
+          connections(["sniffle"])} of
+        {ok, ok} ->
+            ok;
+        _ ->
+            error
+    end.
 
 print_endpoints(Es) ->
     io:format("Hostname            "
@@ -25,7 +30,14 @@ print_endpoints(Es) ->
               "----------"
               " --------------------"
               " ---------------~n", []),
-    [print_endpoint(E) || E <- Es].
+    [print_endpoint(E) || E <- Es],
+    case [print_endpoint(E) || E <- Es] of
+        [] ->
+            error;
+        _ ->
+            ok
+    end.
+
 
 print_endpoint({{Hostname, [{port, Port}, {ip, IP}]}, _, Fails}) ->
     HostPort = <<IP/binary, ":", Port/binary>>,
