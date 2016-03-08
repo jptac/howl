@@ -13,7 +13,7 @@
 │  └─ ddb_client─0.1.17
 │     ├─ dproto─0.1.12
 │     └─ mmath─0.1.15
-├─ howl─0.8.0
+├─ howl─0.8.1
 ├─ jsx─1.4.5
 ├─ jsxd─0.1.10
 ├─ lager─2.1.1
@@ -65,4 +65,4 @@
    │     └─ lhttpc─1.3.0
    ├─ jesse─0.1.3
    ├─ libchunter─0.1.45
-   └─ libsniffle─0.3.37
+   └─ libsniffle─0.3.38
