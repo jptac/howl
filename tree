@@ -9,7 +9,7 @@
 ├─ fifo_utils─0.1.22
 │  └─ uuid─1.5.1
 │     └─ quickrand─1.5.1
-├─ folsom_ddb─0.1.20
+├─ folsom_ddb─0.1.22
 │  └─ ddb_client─0.1.17
 │     ├─ dproto─0.1.12
 │     └─ mmath─0.1.15
@@ -18,19 +18,19 @@
 ├─ jsxd─0.1.10
 ├─ lager─2.1.1
 │  └─ goldrush─0.1.7
-├─ libsnarl─0.3.40
+├─ libsnarl─0.3.44
 │  ├─ fifo_spec─0.1.27
 │  ├─ libsnarlmatch─0.1.7
-│  ├─ mdns_client_lib─0.1.33
+│  ├─ mdns_client_lib─0.1.38
 │  │  ├─ mdns_client─0.1.7
-│  │  └─ pooler─1.4.0
+│  │  └─ pooler─1.5.0
 │  └─ oauth2─0.6.1
 ├─ mdns_server_lib─0.2.3
 │  └─ mdns_server─0.2.0
 ├─ msgpack─0.3.5
 ├─ ranch─1.2.1p
 ├─ recon─2.2.1
-├─ riak_core─2.2.2
+├─ riak_core─2.2.3
 │  ├─ basho_stats─1.0.3
 │  ├─ chash─0.1.1
 │  ├─ clique─3.0.1
