@@ -3,7 +3,7 @@
  {<<"bear">>,{pkg,<<"bear">>,<<"0.8.3">>},3},
  {<<"bugsnag">>,
   {git,"https://github.com/project-fifo/bugsnag-erlang.git",
-       {ref,"537afde79c97f1f97650cf24196297bffeb1f518"}},
+       {ref,"ef8fc83143490512c4329853f42cb48a189903bd"}},
   0},
  {<<"cf">>,{pkg,<<"cf">>,<<"0.2.1">>},4},
  {<<"chash">>,{pkg,<<"chash">>,<<"0.1.1">>},1},
@@ -107,5 +107,5 @@
  {<<"uuid">>,{pkg,<<"uuid_erl">>,<<"1.5.1">>},1},
  {<<"wiggle">>,
   {git,"https://github.com/project-fifo/wiggle-app.git",
-       {ref,"65740dd088644778f8b87323007c4753c5b42de1"}},
+       {ref,"878db3d9bb71d25d35e4a56cb5c33edd066b0c8f"}},
   0}].
