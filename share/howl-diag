@@ -44,13 +44,13 @@ log_run lsof -P $pid
 log_run lsof -F $pid
 
 echo "Copying Logfiles"
-cp -r /var/log/howl $dir/logs
+cp -r /data/howl/log $dir/logs
 cp /var/svc/log/network-howl:default.log $dir/logs
 
 echo "Copying config files"
 mkdir $dir/config
 cp /opt/local/fifo-howl/etc/howl.conf* $dir/config
-cp -r /var/db/howl/generated.configs/ $dir/config
+cp -r /data/howl/db/generated.configs/ $dir/config
 
 echo "Compressing data"
 (cd $base; tar cfz howl-diag-$date.tgz $date)
