@@ -8,7 +8,7 @@
  {<<"cf">>,{pkg,<<"cf">>,<<"0.2.1">>},4},
  {<<"chash">>,{pkg,<<"chash">>,<<"0.1.1">>},1},
  {<<"clique">>,{pkg,<<"clique">>,<<"3.0.1">>},1},
- {<<"cowboy">>,{pkg,<<"cowboy">>,<<"1.0.2">>},0},
+ {<<"cowboy">>,{pkg,<<"cowboy">>,<<"1.0.4">>},0},
  {<<"cowboy_oauth">>,
   {git,"https://github.com/project-fifo/cowoby_oauth.git",
        {ref,"6f1166255e483a65671a0d5bf72715ebc21546e1"}},

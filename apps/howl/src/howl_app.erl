@@ -91,5 +91,5 @@ reply_hook(Code, _Headers, _Body, Req) when Code >= 100 ->
     folsom_metrics:notify({{howl, http, codes, '1xx'}, {inc, 1}}),
     Req;
 reply_hook(_Code, _Headers, _Body, Req) ->
-    folsom_metrics:notify({{howl, codes, other}, {inc, 1}}),
+    folsom_metrics:notify({{howl, http, codes, other}, {inc, 1}}),
     Req.
