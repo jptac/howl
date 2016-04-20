@@ -26,8 +26,8 @@ start(_StartType, _StartArgs) ->
     [folsom_metrics:new_counter({howl, http, codes, Code}) ||
         Code <- Codes],
     {ok, _} = cowboy:start_http(http, Acceptors, [{port, HTTPPort}],
-                                [{env, [{onresponse, fun reply_hook/4},
-                                        {dispatch, Dispatch}]}]),
+                                [{onresponse, fun reply_hook/4},
+                                 {env, [{dispatch, Dispatch}]}]),
     case application:get_env(howl, ssl) of
         {ok, on} ->
             {ok, SSLPort} = application:get_env(howl, ssl_port),
