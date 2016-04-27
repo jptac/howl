@@ -6,7 +6,7 @@
  {<<"cf">>,{pkg,<<"cf">>,<<"0.2.1">>},4},
  {<<"chash">>,{pkg,<<"chash">>,<<"0.1.1">>},1},
  {<<"clique">>,{pkg,<<"clique">>,<<"3.0.1">>},1},
- {<<"cowboy">>,{pkg,<<"cowboy">>,<<"1.0.2">>},0},
+ {<<"cowboy">>,{pkg,<<"cowboy">>,<<"1.0.4">>},0},
  {<<"cowboy_oauth">>,{pkg,<<"cowboy_oauth">>,<<"0.2.14">>},1},
  {<<"cowlib">>,{pkg,<<"cowlib">>,<<"1.0.2">>},1},
  {<<"cuttlefish">>,{pkg,<<"cuttlefish">>,<<"2.0.7">>},1},
