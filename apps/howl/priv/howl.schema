@@ -27,17 +27,17 @@
 
 %% @doc The SSL CA certificate.
 {mapping, "ssl.cacertfile", "howl.ssl_cacertfile",
- [{default, "/var/db/fifo/fifo.crt"},
+ [{default, "/data/fifo/fifo.crt"},
   {datatype, string}]}.
 
 %% @doc The SSL Server certificate
 {mapping, "ssl.certfile", "howl.ssl_certfile",
- [{default, "/var/db/fifo/fifo.pem"},
+ [{default, "/data/fifo/fifo.pem"},
   {datatype, string}]}.
 
 %% @doc The SSL Key file
 {mapping, "ssl.keyfile", "howl.ssl_keyfile",
- [{default, "/var/db/fifo/fifo.key"},
+ [{default, "/data/fifo/fifo.key"},
   {datatype, string}]}.
 
 

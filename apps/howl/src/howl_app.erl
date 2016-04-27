@@ -22,8 +22,12 @@ start(_StartType, _StartArgs) ->
     {ok, Compression} = application:get_env(howl, compression),
 
 
+    Codes = ['5xx', '4xx', '3xx', '2xx', '1xx', other],
+    [folsom_metrics:new_counter({howl, http, codes, Code}) ||
+        Code <- Codes],
     {ok, _} = cowboy:start_http(http, Acceptors, [{port, HTTPPort}],
-                                [{env, [{dispatch, Dispatch}]}]),
+                                [{onresponse, fun reply_hook/4},
+                                 {env, [{dispatch, Dispatch}]}]),
     case application:get_env(howl, ssl) of
         {ok, on} ->
             {ok, SSLPort} = application:get_env(howl, ssl_port),
@@ -36,6 +40,7 @@ start(_StartType, _StartArgs) ->
                                           {certfile, SSLCert},
                                           {keyfile, SSLKey}],
                                          [{compress, Compression},
+                                          {onresponse, fun reply_hook/4},
                                           {env, [{dispatch, Dispatch}]}]);
         _ ->
             ok
@@ -69,3 +74,22 @@ delay_mdns_anouncement([]) ->
 delay_mdns_anouncement([S | R]) ->
     riak_core:wait_for_service(S),
     delay_mdns_anouncement(R).
+
+reply_hook(Code, _Headers, _Body, Req) when Code >= 500 ->
+    folsom_metrics:notify({{howl, http, codes, '5xx'}, {inc, 1}}),
+    Req;
+reply_hook(Code, _Headers, _Body, Req) when Code >= 400 ->
+    folsom_metrics:notify({{howl, http, codes, '4xx'}, {inc, 1}}),
+    Req;
+reply_hook(Code, _Headers, _Body, Req) when Code >= 300 ->
+    folsom_metrics:notify({{howl, http, codes, '3xx'}, {inc, 1}}),
+    Req;
+reply_hook(Code, _Headers, _Body, Req) when Code >= 200 ->
+    folsom_metrics:notify({{howl, http, codes, '2xx'}, {inc, 1}}),
+    Req;
+reply_hook(Code, _Headers, _Body, Req) when Code >= 100 ->
+    folsom_metrics:notify({{howl, http, codes, '1xx'}, {inc, 1}}),
+    Req;
+reply_hook(_Code, _Headers, _Body, Req) ->
+    folsom_metrics:notify({{howl, http, codes, other}, {inc, 1}}),
+    Req.
