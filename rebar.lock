@@ -84,5 +84,5 @@
  {<<"uuid">>,{pkg,<<"uuid_erl">>,<<"1.5.1">>},1},
  {<<"wiggle">>,
   {git,"https://github.com/project-fifo/wiggle-app.git",
-       {ref,"ea105b55c5020af4dbf989fab4273902e2a9661e"}},
+       {ref,"10d88b6d9209716131dd268631521bb9e43a7db2"}},
   0}].
