@@ -12,8 +12,11 @@
 
 start(_StartType, _StartArgs) ->
     DPRules =
+        [{<<"/jp_extra/[...]">>, wiggle_rest_h, [jp_extras_h]}] ++
         [{<<"/howl/[...]">>, howl_http_handler, []}] ++
         wiggle_app:dispatches(),
+
+    io:format("~p~n", [DPRules]),
 
     Dispatch = cowboy_router:compile([{'_', DPRules}]),
 
